@@ -13,7 +13,6 @@ make install
 ## Integration
 Installation will put the framework into a standard search path for make includes.
 You can activate the framework by putting `include make-do.mk` at the top of your makefile.
-into your make file to activate make-do framework.
 
 # Features
 
