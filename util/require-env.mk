@@ -5,8 +5,8 @@
 #  e.g. target: prereq | require-env-BUILD_HOME
 #
 require-env-%:
-	@$(if ${${*}},, $(error required env $* is not defined))
-	@ echo '$$${*} is "${${*}}"'
+	@ $(if ${${*}},, $(error required env $* is not defined))
+	@ $(if $(strip ${DEBUG_REQUIRE_ENV}),echo '$$${*} is "${${*}}"')
 
 ###
 # Generates an error if a variable is not defined.
