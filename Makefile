@@ -1,8 +1,8 @@
 
 install: THIS_DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 install: uninstall
-	-@ install -d $(THIS_DIR) /usr/local/include/make-do
-	-@ install $(THIS_DIR)/make-do.mk /usr/local/include/make-do.mk
+	-@ cp -a $(THIS_DIR) /usr/local/include/make-do
+	-@ cp $(THIS_DIR)/make-do.mk /usr/local/include/make-do.mk
 
 dev-install: THIS_DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
 dev-install: uninstall
