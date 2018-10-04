@@ -10,7 +10,7 @@ dev-install: uninstall
 	-@ test -L /usr/local/include/make-do.mk || ln -s $(THIS_DIR)/make-do.mk /usr/local/include/make-do.mk
 
 uninstall:
-	-@ test -d /usr/local/include/make-do && rmdir /usr/local/include/make-do
+	-@ test -d /usr/local/include/make-do && rm -r /usr/local/include/make-do
 	-@ test -L /usr/local/include/make-do && unlink /usr/local/include/make-do
 	-@ unlink /usr/local/include/make-do.mk
 
