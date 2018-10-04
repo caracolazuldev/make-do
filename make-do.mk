@@ -15,7 +15,21 @@ this-dir := $(dir $(lastword $(MAKEFILE_LIST)))
 # TODO: configure
 MAKE_DO_INSTALL := /usr/local/include/make-do
 
--include $(THIS_DIR)/.env-config
+###
+# Load files containing default variable assignments.
+# Argument must be a directory.
+#
+# For nested modules, support direct execution by loading defaults from a parent directory.
+# We will search up the directory tree until a directory is found that does not contain a .defaults file.
+#
+#	Includes start at the highest in the directory tree because consumers of modules should have precedence.
+# Recommended that defaults file only use ?= assignments.
+#
+#	dir blindly strips off the last component of a path, be it file or dir, so we use it to refer to the parent dir.
+define build-defaults-include-list
+$(if $(realpath $(dir $(1))/.defaults),$(call build-defaults-include-list,$(realpath $(dir $(1))))) $(realpath $(1)/.defaults)
+endef
+include $(call build-defaults-include-list,$(THIS_DIR))
 
 ###
 # Features
