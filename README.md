@@ -46,9 +46,9 @@ The criticism against sub-makes is that for large build systems, it can be a per
 # Variables
 
 ## Default Variable Initialization
-The `.defaults` file is auto-included, but only after any `.defaults` files in parent directories are loaded first. This is to allow intuitive behaviour for an integrated module when invoking make from inside the module directory. Another benefit is that defaults can be overridden without altering the module files themselves and if desired, can be versioned in the consuming project, while the module might be ignored by version control.
+The `.defaults` file is auto-included, but only after any `.defaults` files in parent directories are loaded first. This is to allow intuitive behaviour when not invoking as a sub-make, i.e. from within the directory itself. Another benefit is that defaults can be overridden without altering the module files themselves and if desired, can be versioned in the consuming project, while the module might be ignored by version control.
 
-Note, any directory not containing a `.defaults` file, including the first directory searched, will cause the directory tree crawl to be stopped. It is recommended that your re-usable modules contain a `.defaults` file, even if it is un-used. Not having a `.defaults` file will prevent `.defaults` files in parent directories from loading.
+Note, any directory not containing a `.defaults` file, will cause the directory tree crawl to be stopped.
 
 ## Environment Validation
 Two means of validating that variables are set and generating errors are available.
