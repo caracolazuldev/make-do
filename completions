@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+_mdo_completions()
+{
+  # reportedly borrowed from makes own completions
+  MDO_WORDS=$(mdo -p --dry-run | awk -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}' | sort | uniq )
+  # parens are necessary to create an array
+  COMPREPLY=( $(compgen -W "$MDO_WORDS" ${COMP_WORDS[COMP_CWORD]} | xargs) )
+  return 0
+}
+
+complete -F _mdo_completions mdo

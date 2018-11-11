@@ -1,11 +1,15 @@
 
 install: THIS_DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-install: uninstall
+install: uninstall completions
 	-@ cp -a $(THIS_DIR) /usr/local/include/make-do
 	-@ cp $(THIS_DIR)/make-do.mk /usr/local/include/make-do.mk
 
+.PHONY: completions
+completions:
+	-@ cp $(THIS_DIR)/completions /etc/bash_completion.d/make-do
+
 dev-install: THIS_DIR := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))
-dev-install: uninstall
+dev-install: uninstall completions
 	-@ test -L /usr/local/include/make-do || ln -s $(THIS_DIR) /usr/local/include/make-do
 	-@ test -L /usr/local/include/make-do.mk || ln -s $(THIS_DIR)/make-do.mk /usr/local/include/make-do.mk
 
