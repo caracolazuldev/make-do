@@ -1,11 +1,29 @@
 # make-do
 Make Build System Framework
-
 Adds some helpful functions and variables to makefiles.
 
+Module system and cli command framework.
+
+<!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+
+- [make-do](#make-do)
+	- [Installation](#installation)
+	- [Integration](#integration)
+- [Modules](#modules)
+	- [Using Modules](#using-modules)
+	- [make util-module-init](#make-util-module-init)
+	- [Sub-makes are your friend](#sub-makes-are-your-friend)
+- [Goodies (mdo, Utils, command completion...)](#goodies-mdo-utils-command-completion)
+- [Variables](#variables)
+	- [Default Variable Initialization](#default-variable-initialization)
+	- [Environment Validation](#environment-validation)
+- [User Input](#user-input)
+- [Configuration](#configuration)
+
+<!-- /TOC -->
 ----
 
-# Installation
+## Installation
 Installation is system-wide.
 ```
 git clone ...
@@ -15,7 +33,7 @@ make install
 
 If you want to use make-do without installing system-wide, you will need to ensure that it is in the make includes search directories and set MAKE_DO_INSTALL in make-do.mk.
 
-# Integration
+## Integration
 Installation will put the framework into a standard search path for make includes.
 You can activate the framework by putting `include make-do.mk` at the top of your makefile.
 
@@ -43,6 +61,18 @@ The use-case for modules came from some hard-won lessons about organizing make s
 
 The criticism against sub-makes is that for large build systems, it can be a performance issue when make can not build a full dependency graph because of sub-make calls. So, make-do's response to this rule of thumb is, "avoiding sub-makes is premature optimization." There is a lot of benefit in having re-usable components and even just nice organization for maintainability. Therefore, it is reasoned that for most cases, sub-makes have more benefits than harm.
 
+# Goodies (mdo, Utils, command completion...)
+
+The `mdo` command will give you access to make-do features outside of a module. You can also use it as an alias for make inside your modules, because that's all it really is.
+
+Use command completion with the mdo command (`mdo util-<TAB><TAB>`) to list utilities included in `make-do`.
+
+* `util-generate-cmd`: create a wrapper command for your make-do module
+* `util-install-cmd`: creates a link /usr/local/bin to your command wrapper, and installs a command completion script for you. See the make-do [completions][047213c8] file for an example. Completion sugestions will be the targets in your module.
+* `util-module-init`: generates starter files for your module.
+
+  [047213c8]: completions "completions"
+
 # Variables
 
 ## Default Variable Initialization
@@ -66,4 +96,4 @@ Can currently ask a user for confirmation.
 ```$(call user-confirm, Would you like to continue?)```
 
 # Configuration
-Not integrated yet, but the `util/macro.mk` file contains a function for rendering variables from the environment using a template.
+Help wanted. See #11, integrating Jinja Templating.

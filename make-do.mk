@@ -38,6 +38,8 @@ include $(call build-defaults-include-list,$(THIS_DIR))
 include $(MAKE_DO_INSTALL)/util/require-env.mk
 include $(MAKE_DO_INSTALL)/util/cli.mk
 include $(MAKE_DO_INSTALL)/util/module-init.mk
+include $(MAKE_DO_INSTALL)/util/generate-cmd.mk
+include $(MAKE_DO_INSTALL)/util/install-cmd.mk
 
 # Enable declaration of modules in a hidden file.
 # any declared module can be executed as if it were a target
