@@ -1,20 +1,18 @@
 # make-do
 
-## Introduction
-Quickly create shell commands using a framework based on the make build system. Wrap scripts in modules and install as commands using utils. Create auto-complete (bash_completion) sub-commands from any make target or module.
+Quickly create shell commands using a framework based on the make build system. Wrap any script in a module and create auto-complete (bash_completion) sub-commands from any make target or module. Modules help you manage configurations and defaults, command line interface, and are readily installable.
 
 A framework for make build systems, adds utils for configuration management and user input. Keep build tasks organized as modules and invoke them as targets.
 
 <!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
 
 - [make-do](#make-do)
-	- [Introduction](#introduction)
 	- [Installation](#installation)
 	- [Integration](#integration)
-- [Command Line Interface](#command-line-interface)
+- [Utilities](#utilities)
 - [Modules](#modules)
 	- [Using Modules](#using-modules)
-	- [make util-module-init](#make-util-module-init)
+	- [mdo util-module-init](#mdo-util-module-init)
 	- [Sub-makes are your friend](#sub-makes-are-your-friend)
 - [Variables](#variables)
 	- [Default Variable Initialization](#default-variable-initialization)
@@ -38,9 +36,9 @@ If you want to use make-do without installing system-wide, you will need to ensu
 Installation will put the framework into a standard search path for make includes.
 You can activate the framework by putting `include make-do.mk` at the top of your makefile.
 
-# Command Line Interface
+# Utilities
 
-The `mdo` command will give you access to make-do utilities and generators. You can also use it as an alias for make inside your modules.
+The `mdo` command will give you access to make-do utilities and generators. You can also use it as an alias for make.
 
 * `util-generate-cmd`: create a wrapper command for your make-do module
 * `util-install-cmd`: creates a link /usr/local/bin to your command wrapper, and installs a command completion script for you. See the make-do [completions][047213c8] file for an example. Completion sugestions will be the targets in your module.
@@ -61,13 +59,13 @@ To integrate a make-do module into another make project, after you have added th
 Some modules will have additional functionality other than the default target. To see all of the targets available for a module use the `-C` flag to make to change to the module directory. Command completion will work without having to `cd` to the module directory.
 e.g.
 ```
-user@localhost:~/work/project$> make -C my-module optional-target
+user@localhost:~/work/project$> mdo -C my-module optional-target
 ```
 
 Modules also have the advantage of being able to share configuration files. You can declare all of your configuration variables in your project root, and the make-do modules will automatically pick them up. Be sure to `export` your vars. Copying any variable declarations from a module's `.defaults` file is a good way to get started. See more in the section on [Default Variable Initialization](#default-variable-initialization).
 
-## make util-module-init
-Once you have activated the framework for your make-file, you can initialize a directory as a make-do module simply by runing `make util-module-init` in the directory. This simply creates the standard files, if they don't already exist.
+## mdo util-module-init
+Once you have activated the framework for your make-file, you can initialize a directory as a make-do module simply by runing `mdo util-module-init` in the directory. This simply creates the standard files, if they don't already exist.
 
 ## Sub-makes are your friend
 The use-case for modules came from some hard-won lessons about organizing make scripts. There are several options but they all have their trade-offs. Someone famously said, "Sub-Makes Considered Harmful"...so aren't make-do modules harmful?
@@ -78,6 +76,8 @@ The criticism against sub-makes is that for large build systems, it can be a per
 
 ## Default Variable Initialization
 The `.defaults` file is auto-included, but only after any `.defaults` files in parent directories are loaded first. This is to allow intuitive behaviour when not invoking as a sub-make, i.e. from within the directory itself. Another benefit is that defaults can be overridden without altering the module files themselves and if desired, can be versioned in the consuming project, while the module might be ignored by version control.
+
+Be sure to use the conditional (if-empty) assignment operator ` ?= ` in .defaults files unless you want to disable the ability to override the variable.
 
 Note, any directory not containing a `.defaults` file, will cause the directory tree crawl to be stopped.
 
