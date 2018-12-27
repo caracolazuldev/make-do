@@ -1,6 +1,8 @@
 
-util-module-init:
+util-module-init: Makefile
 	touch .modules .defaults
-	echo 'include make-do.mk' > Makefile
-	@echo '' >>Makefile
-	@echo 'all:' >>Makefile
+
+Makefile:
+	echo 'include make-do.mk' > $@
+	@echo '' >>$@
+	@echo 'all:' >>$@
