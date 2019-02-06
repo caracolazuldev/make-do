@@ -1,6 +1,6 @@
 
 util-generate-cmd: CMD_DIR ?= ${THIS_DIR}
-util-generate-cmd: CMD_FILE ?= $(notdir ${CMD_DIR}))
+util-generate-cmd: CMD_FILE ?= $(notdir ${CMD_DIR})
 util-generate-cmd: util-generate-cmd-completions
 	@ test ! -f "${CMD_FILE}" || ( echo command would be overwritten && false )
 	@ echo '#!/usr/bin/env bash' > ${CMD_FILE}
