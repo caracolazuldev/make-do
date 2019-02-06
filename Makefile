@@ -21,7 +21,8 @@ system-install:
 completions:
 	-@ cp ${THIS_DIR}/completions /etc/bash_completion.d/make-do
 	-@ chmod go+r /etc/bash_completion.d/make-do
-	. /etc/bash_completion.d/make-do
+	# Recommended: source /etc/bash_completion.d/make-do
+	# to enable mdo completions for this login session.
 
 dev-install: THIS_DIR := $(realpath $(dir $(lastword ${MAKEFILE_LIST})))
 dev-install: uninstall completions
