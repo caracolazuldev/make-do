@@ -4,6 +4,9 @@ install: uninstall completions
 	-@ cp -a $(THIS_DIR) /usr/local/include/make-do
 	-@ cp $(THIS_DIR)/make-do.mk /usr/local/include/make-do.mk
 
+system-install:
+	-@ ln -s /usr/local/include/make-do/mdo /usr/local/bin/mdo
+
 .PHONY: completions
 completions:
 	-@ cp $(THIS_DIR)/completions /etc/bash_completion.d/make-do
