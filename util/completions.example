@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# replace all instances of my_cmd with the name of your command
+# hide unwanted targets (e.g. make-do provided targets) with patterns in $blacklist
+
+# Set COMPREPLY to an array of discovered completions
+_my_cmd_completions()
+{
+  # sed patterns to exclude targets
+  blacklist=( 'util-.*' 'require-env-.*' 'Makefile' 'completions')
+
+  MAKE_TARGET_WORDS=$(make -p --dry-run | awk -F':' '/^[a-zA-Z0-9][^$#\/\t=]*:([^=]|$)/ {split($1,A,/ /);for(i in A)print A[i]}' | sort | uniq )
+
+  for bad in ${blacklist[@]};
+  do
+    MAKE_TARGET_WORDS=$( echo ${MAKE_TARGET_WORDS} | sed -e s/$bad//g )
+  done
+  COMPLETE_WORDS=${MAKE_TARGET_WORDS}
+
+  # parens are necessary to create an array
+  # xargs accumulates multiple lines into one line
+  COMPREPLY=( $(compgen -W "$COMPLETE_WORDS" ${COMP_WORDS[COMP_CWORD]} | xargs) )
+  return 0
+}
+
+complete -F _my_cmd_completions my_cmd
