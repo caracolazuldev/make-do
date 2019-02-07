@@ -74,6 +74,13 @@ The criticism against sub-makes is that for large build systems, it can be a per
 
 # Variables
 
+### Provided by Make-Do
+
+* `THIS_DIR` - the location of the module files.
+* `MAKE_DO_INSTALL` - the location of the make-do library
+* `MODULES_DEF_FILE` - `$(THIS_DIR)`/.modules
+* `MODULES` - result of loading the .modules file, if it exists.
+
 ## Default Variable Initialization
 The `.defaults` file is auto-included, but only after any `.defaults` files in parent directories are loaded first. This is to allow intuitive behaviour when not invoking as a sub-make, i.e. from within the directory itself. Another benefit is that defaults can be overridden without altering the module files themselves and if desired, can be versioned in the consuming project, while the module might be ignored by version control.
 

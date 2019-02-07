@@ -7,7 +7,8 @@ export SHELL := sh
 # Variables
 ###
 
-# for makefiles that include this file, provide:
+# for makefiles that include this file, provide
+# the location of the module:
 THIS_DIR = $(shell pwd)
 # for use in this file, or use at your own risk:
 this-dir := $(dir $(lastword $(MAKEFILE_LIST)))
