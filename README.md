@@ -46,7 +46,7 @@ The `mdo` command will give you access to make-do utilities and generators. You 
 
 Use command completion with the mdo command (`mdo util-<TAB><TAB>`) to list all of the utilities included in `make-do`.
 
-To add command completion to your command, edit the `completions` file created by `util-generate-cmd`. Currently, you will need to replace all occurences of `{my_cmd}`, e.g. `_{my_cmd}_completions()` -> `_spiffy_completions()`. You can then copy or link the file to `/etc/bash_completion.d/`. Note, completion scripts are only sourced on user login.
+To add command completion to your command, edit the `completions` file created by `util-generate-cmd`. Currently, you will need to replace all occurences of `{my_cmd}`, e.g. `_{my_cmd}_completions()` -> `_spiffy_completions()` if your executable is named `spiffy`. You can then copy or link the file to `/etc/bash_completion.d/`. Note, completion scripts are only sourced on user login.
 
   [047213c8]: completions "completions"
 
