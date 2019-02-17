@@ -1,0 +1,2 @@
+DATABASE_USER ?= dbuser
+DATABASE_PASSWORD ?= simplepass

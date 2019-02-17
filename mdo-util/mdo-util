@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+
+make -f /home/mzd/work/stand-up/make-do/mdo-util/Makefile "$@"

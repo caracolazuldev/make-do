@@ -1,7 +1,13 @@
 #!/bin/bash
 
+# invoke make with the make-do library on the include path
+# no-built-in : skip all that archaic compiler stuff:
+# quiet: shush. Use --trace to override.
+MAKE_CMD='make -I /usr/local/include/make-do/includes --no-builtin-rules --no-builtin-variables --quiet'
+
 if [ ! -f Makefile ] && [ ! -f makefile ]; then
-  echo "include make-do.mk" | make -I /usr/local/include/make-do/util -f - "$@" 2>/dev/null
+  # we must not be in a make-do-module, so we must include the lib
+  echo "include make-do.mk" | ${MAKE_CMD} -f - "$@" 2>/dev/null
 else
-  make -I /usr/local/include/make-do/util "$@"
+  ${MAKE_CMD} "$@"
 fi

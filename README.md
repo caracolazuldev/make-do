@@ -41,16 +41,16 @@ You can activate the framework by putting `include make-do.mk` at the top of you
 The `mdo` command will give you access to make-do utilities and generators. You can also use it as an alias for make.
 
 * `util-generate-cmd`: create a wrapper command for your make-do module, including a starter for bash completion.
-* `util-install-cmd`: creates a link /usr/local/bin to your command wrapper, and installs a command completion script for you. See the make-do [completions][047213c8] file for an example. Completion sugestions will be the targets in your module.
+* `util-install-cmd`: creates a link /usr/local/bin to your command wrapper, and installs a command completion script for you. See the make-do [.completions][047213c8] file for an example. Completion sugestions will be the targets in your module.
 * `util-module-init`: generates starter files for your module.
 
 Use command completion with the mdo command (`mdo util-<TAB><TAB>`) to list all of the utilities included in `make-do`.
 
-To add command completion to your command, edit the `completions` file created by `util-generate-cmd`. Currently, you will need to replace all occurences of `{my_cmd}`, e.g. `_{my_cmd}_completions()` -> `_spiffy_completions()` if your executable is named `spiffy`. You can then copy (and rename) or link the file to `/etc/bash_completion.d/`. Note, completion scripts are only sourced on user login.
+To add command completion to your command, edit the `.completions` file created by `util-generate-cmd`. Currently, you will need to replace all occurences of `{my_cmd}`, e.g. `_{my_cmd}_completions()` -> `_spiffy_completions()` if your executable is named `spiffy`. You can then copy (and rename) or link the file to `/etc/bash_completion.d/`. Note, completion scripts are only sourced on user login.
 
 The generated completions file will cause any make targets defined in the module to be available as completions. A black-list is included that excludes make-do special targets. You can hide any targets in your module by adding them to the blacklist. Patterns used by sed are supported in the black-list.
 
-  [047213c8]: completions "completions"
+  [047213c8]: .completions ".completions"
 
 # Modules
 Make-do Modules are intended to be invoked as sub-makes. Make-do handles the sub-make invocation for you, as well as listing the module as an available target when using command (TAB) completion.

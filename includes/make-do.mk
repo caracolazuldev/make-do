@@ -7,14 +7,17 @@ export SHELL := sh
 # Variables
 ###
 
-# for makefiles that include this file, provide
-# the location of the module:
-THIS_DIR = $(shell pwd)
-# for use in this file, or use at your own risk:
-this-dir := $(dir $(lastword $(MAKEFILE_LIST)))
+# For makefiles that include this file, provide the location of the module.
+# Do not use this as a build destination.
+# Make-do Modules are intended to use separated build directories and should always
+# create targets in the current directory.
+THIS_DIR := $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
+#$(info THIS_DIR $(THIS_DIR))
+#$(info MAKEFILE_LIST $(MAKEFILE_LIST))
 
-# TODO: configure
-MAKE_DO_INSTALL := /usr/local/include/make-do
+MAKE_DO_INSTALL := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))/make-do
+
+#$(info MAKE_DO_INSTALL $(MAKE_DO_INSTALL))
 
 ###
 # Load files containing default variable assignments.
@@ -32,24 +35,25 @@ $(if $(realpath $(dir $(1))/.defaults),$(call build-defaults-include-list,$(real
 endef
 include $(call build-defaults-include-list,$(THIS_DIR))
 
-###
-# Features
-###
-
-include $(MAKE_DO_INSTALL)/util/require-env.mk
-include $(MAKE_DO_INSTALL)/util/cli.mk
-include $(MAKE_DO_INSTALL)/util/module-init.mk
-include $(MAKE_DO_INSTALL)/util/generate-cmd.mk
-include $(MAKE_DO_INSTALL)/util/install-cmd.mk
-
 # Enable declaration of modules in a hidden file.
 # any declared module can be executed as if it were a target
 MODULES_DEF_FILE := $(THIS_DIR)/.modules
 MODULES := $(shell test -f $(MODULES_DEF_FILE) && cat $(MODULES_DEF_FILE))
 .PHONY: $(MODULES)
 
+# make modules available as targets
 $(MODULES):
-	@cd $@ && $(MAKE)
+	$(MAKE) -f ${THIS_DIR}/$@/Makefile
+
+# Prevent re-loading make-do libraries:
+#ifneq ( $(MDO_LOADED), TRUE)
+
+###
+# Features
+###
+
+include $(MAKE_DO_INSTALL)/includes/require-env.mk
+include $(MAKE_DO_INSTALL)/includes/cli.mk
 
 ###
 # Reset the default goal/target so above targets don't interfere with expectations.
@@ -62,3 +66,7 @@ $(MODULES):
 #define init-this-dir :=
 #$(realpath $(dir $(subst $(lastword $(MAKEFILE_LIST)), ,$(MAKEFILE_LIST) ) ) )
 #endef
+
+# END Prevent re-loading make-do
+#endif
+#MDO_LOADED := TRUE

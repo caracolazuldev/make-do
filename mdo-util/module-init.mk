@@ -1,5 +1,5 @@
 
-util-module-init: Makefile
+module-init: Makefile
 	touch .modules .defaults
 
 Makefile:
