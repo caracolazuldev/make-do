@@ -44,6 +44,8 @@ If you install make-do globally, it will put the framework into a standard searc
 
 If you want to use make-do without installing system-wide, you will need to ensure that it is in the make includes search directories and set MAKE_DO_INSTALL in make-do.mk.
 
+Read more [about modules](docs/modules.md).
+
 ### In defense of sub-makes
 
 The use-case for modules came from some hard-won lessons about organizing make scripts. There are several options but they all have their trade-offs. Someone famously said, "Sub-Makes Considered Harmful"...so aren't make-do modules harmful?
