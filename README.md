@@ -59,6 +59,9 @@ Why write commands using make, you ask?
 - environment variables make for light-weight parameters. It may seem strange at first to not use terse flags or double-hyphen parameters, but you quickly realize how convenient it is to just set variables in the shell. 
 - Highly extensible. Easily integrate other tools through the shell.
 
+> I was thinking about writing a blog post about why I love `make` but I can fit it in a tweet: it’s the beauty in what is implied and not explicit in that everything is a dependency
+> Jessie Frazelle :: https://twitter.com/jessfraz/status/1097631278290165760
+
 See the [mdo-util guide](docs/mdo-util.md) to get started writing commands with make-do.
 
 ## User Input
