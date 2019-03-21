@@ -37,6 +37,7 @@ You can install bash and make using Homebrew.
 - https://troymccall.com/better-bash-4--completions-on-osx/
 
 [Help wanted: complete guide for mac installation.]
+http://rtfm.evanchute.com/macos-homebrew-homebrew-system-shit/upgrading-bash-and-bash-completion
 
 ## Build-System Sub-Modules
 
