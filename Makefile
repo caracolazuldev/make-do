@@ -11,12 +11,12 @@ all: uninstall install
 
 .PHONY: completions
 completions:
-	cp ${THIS_DIR}/.completions /etc/bash_completion.d/make-do
-	cp ${THIS_DIR}/mdo-util/.completions /etc/bash_completion.d/mdo-util
-	chmod a+r /etc/bash_completion.d/mdo-util
-	chmod a+r /etc/bash_completion.d/make-do
+	cp ${THIS_DIR}/.completions /usr/local/etc/bash_completion.d/make-do
+	cp ${THIS_DIR}/mdo-util/.completions /usr/local/etc/bash_completion.d/mdo-util
+	chmod a+r /usr/local/etc/bash_completion.d/mdo-util
+	chmod a+r /usr/local/etc/bash_completion.d/make-do
 	@ echo To enable mdo completions for this login session,
-	@ echo source /etc/bash_completion.d/\*
+	@ echo source /usr/local/etc/bash_completion.d/\*
 
 ${include_file_path}/make-do.mk:
 	cp ${THIS_DIR}/includes/make-do.mk ${include_file_path}/make-do.mk
@@ -46,8 +46,8 @@ dev-install: dev-library install
 
 .PHONY: uninstall-completions
 uninstall-completions:
-	rm -f /etc/bash_completion.d/mdo-util
-	rm -f /etc/bash_completion.d/make-do
+	rm -f /usr/local/etc/bash_completion.d/mdo-util
+	rm -f /usr/local/etc/bash_completion.d/make-do
 
 .PHONY: uninstall-library
 uninstall-library:
