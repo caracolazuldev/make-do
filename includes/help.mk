@@ -9,7 +9,7 @@
 # Uses README.md, or README, by default.
 # If Pandoc is available, will convert Markdown to Plain Text.
 # 
-# Provide HELP_TEXT as a variable if you do not want to use a markdown file.
+# Provide HELP_TEXT as a variable if you do not want to use text from a file.
 #
 # # #
 
