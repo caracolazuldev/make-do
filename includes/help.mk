@@ -18,6 +18,11 @@ HELP_FILE = $(or $(wildcard ${README}.md),$(wildcard ${README}))
 
 pandoc != command -v pandoc 2>/dev/null
 
+# Un-set pandoc if README is not a markdown file.
+ifneq (.md,$(findstring .md,${HELP_FILE}))
+pandoc := 
+endif
+
 # Nota Bene:
 # compound-conditionals achieved by detecting false as an empty-string
 # So, true is not-equal to empty:
