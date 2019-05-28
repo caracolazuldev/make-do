@@ -23,8 +23,13 @@
 #
 # # #
 
-printf '\nGenerating Configuration.\n'
-printf '\nLeave blank for default value.\n'
+printf '\nGenerating Configuration of %s.\n' "$1"
+printf 'Continue? (Y/N) [N]'
+read yes
+if ( [ "$yes" = 'n' ] || [ "$yes" = 'N' ] || [ -z "$yes" ] ); then
+	exit 0
+fi
+printf '\nLeave blank for default [value].\n'
 
 # get vars to set from the tpl:
 while IFS= read -r conf; do
@@ -57,7 +62,7 @@ while IFS= read -r conf; do
 	printf 'export %s = %s%s\n' "$the_var" "$default" "$help" 
 done < "$1"
 
-printf '\nCommit these changes? [Y/n]'
+printf '\nCommit these changes? (Y/N) [N]'
 read yes
 
 if ( [ "$yes" = 'Y' ] || [ "$yes" = 'y' ] ); then

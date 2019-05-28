@@ -22,6 +22,10 @@
 #
 # Provides a target, "configure" that will interactively prompt you to enter the config values. Since the config file is always loaded first, you can run configure multiple times, and existing configs will be loaded as default values.
 #
+# TIP: you can create configurations without a Makefile.
+# e.g. make -B -f utils/configure-utils.mk -f conf/db.conf
+# -B will force if you want to re-configure an existing file.
+#
 # # #
 
 # # #
