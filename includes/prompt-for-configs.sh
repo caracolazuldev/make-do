@@ -48,7 +48,7 @@ while IFS= read -r conf; do
 	if [ -z "$reply" ]; then
 		reply="$default"
 	fi
-	eval ${the_var}="$reply"
+	eval ${the_var}="'$reply'"
 done < "$1"
 
 
