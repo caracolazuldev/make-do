@@ -24,18 +24,18 @@ pandoc :=
 endif
 
 # Nota Bene:
-# compound-conditionals achieved by detecting false as an empty-string
+# compound-conditionals( $(and ...) ) achieved by detecting false as an empty-string
 # So, true is not-equal to empty:
-
+#
 help:
 ifdef HELP_TEXT
 	@ $(info ${HELP_TEXT})
-else ifneq (,$(and ${pandoc},$(wildcard ${HELP_FILE})))
+else ifneq (,$(and ${pandoc},$(wildcard ${HELP_FILE})))	# we can use pandoc and the file exists
 	@ pandoc -f markdown -t plain ${HELP_FILE}
-else ifeq (${HELP_FILE},$(wildcard ${HELP_FILE}))
+else ifeq (${HELP_FILE},$(wildcard ${HELP_FILE}))	# a file is configured and exists
 	@ cat ${HELP_FILE}
 else
-	$(info Use the source, Luke.)
+	$(info Use the source, Luke.)			# we tried our best, sorry
 endif
 
 .DEFAULT_GOAL := ${CACHED_DG}
