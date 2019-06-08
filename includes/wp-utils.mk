@@ -1,6 +1,12 @@
 # # #
 # Gnu Make functions for Wordpress developers
 #
+# Depends on:
+#  - ${WEB_ROOT}
+#  - ${REPOS}
+
+WEB_ROOT ?= htdocs/#
+REPOS ?= repos/#
 
 define purge-wp-plugin
 	- cd ${WEB_ROOT} && wp plugin deactivate ${@} 
@@ -29,19 +35,15 @@ endef
 # Expects the default target to create a plugin distro zip
 #
 plugin-%.zip:
-	$(eval repo := '$(shell find . -type d -name ${*})')
+	$(eval repo := '$(shell find ${REPOS} -type d -name ${*})')
 	#
 	# WARNING: guessed plugin location ${repo}
 	# 
 	cd ${repo} && $(MAKE)
 
-define build-wp-plugin
-	# ATTEMPT BUILD OF PLUGIN ${*}
-	$(MAKE) plugin-${@}.zip
-endef
-
 define deploy-wp-plugin
-	$(eval plugin := '$(shell find . -name ${@}.zip)')
+	# $(shell find ${REPOS} -name ${@}.zip)
+	$(eval plugin := '$(shell find ${REPOS}  -name ${@}.zip)')
 	#
 	# WARNING: found plugin distro-zip, ${plugin}
 	#
