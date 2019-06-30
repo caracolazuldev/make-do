@@ -18,7 +18,10 @@
 # TIP: terminate paths with a hash/sharp to avoid the error of trailing-white-space.
 #
 # FEATURES:
-# Auto-includes the files in the CONFIG_INCLUDES list.
+# Includes the files in the CONFIG_INCLUDES list.
+#
+# Set AUTO_INCLUDE_CONFS instead of CONFIG_INCLUDES to include files that match conf/*.conf.
+# e.g. AUTO_INCLUDE_CONFS = true # i.e. empty is false
 #
 # Provides an implicit recipe for %.conf files. This causes missing configuration files to be automatically (and interactively) generated.
 #
@@ -43,6 +46,10 @@ escape-spaces = $(subst ${space},\${space},$(strip $1))
 # # #
 # keep track of this location
 this-dir := $(call escape-spaces,$(realpath $(dir $(lastword $(MAKEFILE_LIST)))))/
+
+ifdef AUTO_INCLUDE_CONFS
+ CONFIG_INCLUDES = $(shell find conf -name *.conf)
+endif
 
 ifndef CONFIG_INCLUDES
 $(error CONFIG_INCLUDES must be set before including configure-utils.mk)
