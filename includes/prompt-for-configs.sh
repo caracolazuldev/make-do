@@ -33,17 +33,19 @@ printf '\nLeave blank for default [value].\n'
 
 # get vars to set from the tpl:
 while IFS= read -r conf; do
-	test "${conf#*export}" = "$conf" && continue;	# discard lines that don't begin with 'export'
+	test "${conf#*=}" = "$conf" && continue;	# discard lines that aren't assignments
 
-	the_var=$(echo "$conf" | sed -s 's/export[[:space:]]*\([^[:space:]]*\).*/\1/')
-	help=$(echo "$conf" | sed -s 's/[^#]*#*\([^#]*\)$/\1/')
-	test -n "$help" && help="($help ) "
+	var_declaration=$(echo "$conf" | sed -s 's/\([^=?]*\).*/\1/')
+	the_var=${var_declaration#*export} # remove 'export'
+	the_var=$(echo "${the_var}" | awk '{$1=$1}1') # trim spaces
+
 	default=$(eval echo -n \"'$'$the_var\")
-	# dev detritus:
-	#echo found the_var="$the_var"
-	#echo found help="$help"
-	#echo found default="$default"
-	printf 'export %s %s= [%s]? ' "$the_var" "$help" "$default"
+	default=$(echo "${default}" | awk '{$1=$1}1') # trim spaces
+
+	helptxt=$(echo "$conf" | sed -s 's/[^#]*#*\([^#]*\)$/\1/')
+	test -n "$helptxt" && help="($helptxt )"	# show provided help
+	
+	echo -n ${var_declaration} ${help}= [${default}]?' '
 	read -r reply </dev/tty
 	if [ -z "$reply" ]; then
 		reply="$default"
@@ -54,12 +56,17 @@ done < "$1"
 
 printf '\nReview Changes:\n'
 while IFS= read -r conf; do
-	test "${conf#*export}" = "$conf" && continue;
-	the_var=$(echo "$conf" | sed -s 's/export[[:space:]]*\([^[:space:]]*\).*/\1/')
-	help=$(echo "$conf" | sed -s 's/[^#]*#*\([^#]*\)$/\1/')
-	test -n "$help" && help="#($help ) "
+	test "${conf#*=}" = "$conf" && continue;	# discard lines that aren't assignments
+
+	var_declaration=$(echo "$conf" | sed -s 's/\([^=?]*\).*/\1/')
+	the_var=${var_declaration#*export} # remove 'export'
+	the_var=$(echo "${the_var}" | awk '{$1=$1}1') # trim spaces
+
+	helptxt=$(echo "$conf" | sed -s 's/[^#]*#*\([^#]*\)$/\1/')
+	test -n "$helptxt" && help="#$helptxt"	# show provided help
 	default=$(eval echo -n \"'$'$the_var\")
-	printf 'export %s = %s%s\n' "$the_var" "$default" "$help" 
+
+	echo "$var_declaration" = "$default" "$help"
 done < "$1"
 
 printf '\nCommit these changes? (Y/N) [N]'
