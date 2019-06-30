@@ -24,9 +24,9 @@
 # # #
 
 printf '\nGenerating Configuration of %s.\n' "$2"
-printf 'Continue? (Y/N) [N]'
+printf 'Continue? (Y/N) [Y]'
 read -r yes
-if ( [ "$yes" = 'n' ] || [ "$yes" = 'N' ] || [ -z "$yes" ] ); then
+if ( [ "$yes" = 'n' ] || [ "$yes" = 'N' ] || [ -n "$yes" ] ); then
 	exit 0
 fi
 printf '\nLeave blank for default [value].\n'
