@@ -20,10 +20,12 @@
 # FEATURES:
 # Auto-includes the files in the CONFIG_INCLUDES list.
 #
-# Provides a target, "configure" that will interactively prompt you to enter the config values. Since the config file is always loaded first, you can run configure multiple times, and existing configs will be loaded as default values.
+# Provides an implicit recipe for %.conf files. This causes missing configuration files to be automatically (and interactively) generated.
 #
-# TIP: you can create configurations without a Makefile.
-# e.g. make -B -f utils/configure-utils.mk -f conf/db.conf
+# Provides a target, "reconfigure" that will interactively prompt you to enter the config values. Since the config file is always loaded first, you can run configure multiple times, and existing configs will be loaded as default values.
+#
+# TIP: to generate a specific conf file, just make it!
+# e.g. make -B -f utils/configure-utils.mk  conf/db.conf
 # -B will force if you want to re-configure an existing file.
 #
 # # #
@@ -50,8 +52,9 @@ include ${CONFIG_INCLUDES}
 %-is-exec:
 	chmod a+x ${*}
 
-configure:
-	$(MAKE) -RrB ${CONFIG_INCLUDES}
+reconfigure:
+	make -RrB ${CONFIG_INCLUDES}
+.PHONY: configure
 
 # # #
 # Shell command to replace {{TOKENs}} in a file
