@@ -8,9 +8,10 @@
 #
 # IMPORTANT: each of your config files must have a template file (.tpl). Config files must have a .conf file-extension.
 #
-# WARNING: escape spaces in paths your config-include list. 
+# Provide defaults for your project by including a .conf file, or include another defaults file.
 #
-# WARNING: ignores lines that do not contain an 'export'.
+# WARNING: escape spaces in paths in your config-include list. 
+#
 # SAMPLE: export PROJECT_ROOT ?= /var/www/# comments like this are used in user-prompts.
 #	prompt: export PROJECT_ROOT ( comments liek this are used in user-prompts. ) = [/var/www/]?
 #
@@ -20,8 +21,10 @@
 # FEATURES:
 # Includes the files in the CONFIG_INCLUDES list.
 #
-# Set AUTO_INCLUDE_CONFS instead of CONFIG_INCLUDES to include files that match conf/*.conf.
+# Set AUTO_INCLUDE_CONFS instead of CONFIG_INCLUDES to include files that have a .tpl file in conf/.
 # e.g. AUTO_INCLUDE_CONFS = true # i.e. empty is false
+#	if the files conf/project.tpl, conf/db.tpl exist:
+#	CONFIG_INCLUDES will contain conf/project.conf conf/db.conf
 #
 # Provides an implicit recipe for %.conf files. This causes missing configuration files to be automatically (and interactively) generated.
 #
@@ -48,7 +51,7 @@ escape-spaces = $(subst ${space},\${space},$(strip $1))
 this-dir := $(call escape-spaces,$(realpath $(dir $(lastword $(MAKEFILE_LIST)))))/
 
 ifdef AUTO_INCLUDE_CONFS
- CONFIG_INCLUDES = $(shell find conf -name *.conf)
+CONFIG_INCLUDES = $(subst .tpl,.conf,$(shell find conf -name *.tpl))
 endif
 
 ifndef CONFIG_INCLUDES
