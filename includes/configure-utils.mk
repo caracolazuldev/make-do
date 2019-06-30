@@ -63,7 +63,7 @@ include ${CONFIG_INCLUDES}
 	chmod a+x ${*}
 
 reconfigure:
-	make -RrB ${CONFIG_INCLUDES}
+	$(MAKE) -RrB ${CONFIG_INCLUDES}
 .PHONY: reconfigure
 
 # # #
