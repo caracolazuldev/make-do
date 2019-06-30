@@ -59,7 +59,33 @@ $(error CONFIG_INCLUDES must be set before including configure-utils.mk)
 endif
 include ${CONFIG_INCLUDES}
 
+###
+# generate a list of variable names by parsing strings on stdin
+#
+# operates on lines containing an = sign
+# discards 'export' if present
+#
+# e.g. $(eval THEVARS := $(shell $(conf_get_var_names) < ${*}.tpl))
+define conf_get_var_names :=
+awk '{ if ( index($$0, "=") ) { \
+    equals = index($$0, "="); envar = substr($$0, 0, equals-1); \
+    if ( index(envar, "export") ) envar = substr(envar, length("export ")+1); \
+    print envar; \
+}}'
+endef
+
+###
+# Interactively generate a conf file from a template of the same basename and extension, .tpl.
+# If the variable is defined either by the environment or previous inclusion of the same file, 
+# the value will be offered as the default.
+#
+# Exports the variables to be replaced before calling the interactive shell script.
+#
+# Simply including the .conf file can trigger this rule if the file doesn't exist.
+#
 %.conf: | ${this-dir}prompt-for-configs.sh-is-exec
+	@$(eval THEVARS := $(shell $(conf_get_var_names) < ${*}.tpl))
+	$(foreach var,${THEVARS},$(eval export ${var})) \
 	${this-dir}prompt-for-configs.sh ${*}.tpl ${@}
 
 %-is-exec:
