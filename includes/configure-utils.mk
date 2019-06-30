@@ -44,9 +44,13 @@ escape-spaces = $(subst ${space},\${space},$(strip $1))
 # keep track of this location
 this-dir := $(call escape-spaces,$(realpath $(dir $(lastword $(MAKEFILE_LIST)))))/
 
+ifndef CONFIG_INCLUDES
+$(error CONFIG_INCLUDES must be set before including configure-utils.mk)
+endif
 include ${CONFIG_INCLUDES}
 
 %.conf: | ${this-dir}prompt-for-configs.sh-is-exec
+	$(info RESTART: ${MAKE_RESTARTS})
 	${this-dir}prompt-for-configs.sh ${*}.tpl ${@}
 
 %-is-exec:
