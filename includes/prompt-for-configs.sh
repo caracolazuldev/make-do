@@ -25,7 +25,7 @@
 
 printf '\nGenerating Configuration of %s.\n' "$2"
 printf 'Continue? (Y/N) [N]'
-read yes
+read -r yes
 if ( [ "$yes" = 'n' ] || [ "$yes" = 'N' ] || [ -z "$yes" ] ); then
 	exit 0
 fi
@@ -44,7 +44,7 @@ while IFS= read -r conf; do
 	#echo found help="$help"
 	#echo found default="$default"
 	printf 'export %s %s= [%s]? ' "$the_var" "$help" "$default"
-	read reply </dev/tty
+	read -r reply </dev/tty
 	if [ -z "$reply" ]; then
 		reply="$default"
 	fi
@@ -63,7 +63,7 @@ while IFS= read -r conf; do
 done < "$1"
 
 printf '\nCommit these changes? (Y/N) [N]'
-read yes
+read -r yes
 
 if ( [ "$yes" = 'Y' ] || [ "$yes" = 'y' ] ); then
 	perl -p -e 's#\{\{([^}]+)\}\}#defined $ENV{$1} ? $ENV{$1} : $&#eg' < "$1" >"$2"
