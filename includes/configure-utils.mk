@@ -58,7 +58,7 @@ include ${CONFIG_INCLUDES}
 
 reconfigure:
 	make -RrB ${CONFIG_INCLUDES}
-.PHONY: configure
+.PHONY: reconfigure
 
 # # #
 # Shell command to replace {{TOKENs}} in a file
