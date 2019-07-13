@@ -48,10 +48,6 @@ space :=
 space += # hack that exploits implicit space added when concatenating assignment
 escape-spaces = $(subst ${space},\${space},$(strip $1))
 
-# # #
-# keep track of this location
-this-dir := $(call escape-spaces,$(realpath $(dir $(lastword $(MAKEFILE_LIST)))))/
-
 ifdef AUTO_INCLUDE_CONFS
 CONFIG_INCLUDES = $(subst .tpl,.conf,$(shell find conf -name *.tpl))
 endif
@@ -61,38 +57,98 @@ $(error CONFIG_INCLUDES must be set before including configure-utils.mk)
 endif
 include ${CONFIG_INCLUDES}
 
-###
+# # #
 # generate a list of variable names by parsing strings on stdin
-#
-# operates on lines containing an = sign
-# discards 'export' if present
-#
 # e.g. $(eval THEVARS := $(shell $(conf_get_var_names) < ${*}.tpl))
-define conf_get_var_names :=
-awk '{ if ( index($$0, "=") ) { \
-    equals = index($$0, "="); envar = substr($$0, 0, equals-1); \
-    if ( index(envar, "export") ) envar = substr(envar, length("export ")+1); \
-    print envar; \
-}}'
+#
+define conf_get_var_names
+awk '\
+/=/ { print parse_var($$0); } \
+function parse_var(s, 	var) { var = parse_declaration(s); sub("export","",var); return trim(var); } \
+function parse_declaration(s) { match(s,/[^?=]*/); return substr(s,RSTART, RLENGTH); } \
+${awk_utils}'
+endef
+
+# # # 
+# Prompt for config values following a template file.
+# e.g. - $(interactive-config) ${*}.tpl 
+#
+define interactive-config
+awk -v WRITE_CONFIG='${@}' '\
+BEGIN { \
+	printf "\nGenerating Configuration of %s.\n","WRITE_CONFIG" ; print "( Press Enter to continue. C to cancel. )" ; \
+	getline user < "-" ; if ( user ) { bailed = 1; exit 0; } \
+	\
+	print "\nLeave blank for default [value].\n" ; \
+} \
+/=/ { \
+	declaration = parse_declaration($$0); \
+	the_var = parse_var($$0); \
+	default_val = trim(ENVIRON[the_var]); \
+	helptext = parse_help($$0); \
+	\
+	printf "("helptext") " declaration "? [" default_val "] "; getline user < "-"; \
+	configs[the_var] = (user) ? user : default_val ; \
+	review[the_var] = sprintf("%s = %s %s", declaration, configs[the_var], helptext) ;\
+} \
+END { \
+	if ( bailed ) { exit 0 } \
+	\
+	print "\nReview Changes:"; for (i in review) { print review[i]; } \
+	\
+	printf "\nCommit these changes? [Y/n]"; getline user < "-"; \
+	if ( user == "Y" || user == "y" ) { \
+		system("rm \"WRITE_CONFIG\" 2>/dev/null"); \
+		while ( (getline line < FILENAME) > 0 ) { emit_config(line); } \
+	}\
+} \
+function emit_config(line) { \
+	if ( match(line,/=/)) { \
+		the_var = parse_var(line); token = "{{" the_var "}}"; \
+		\
+		system("echo '\''" line "'\'' | sed '\''s/" token "/" configs[the_var] "/g'\'' >> \"WRITE_CONFIG\""); \
+	} else { \
+		system("echo '\''" line "'\'' >> \"WRITE_CONFIG\""); \
+	} \
+} \
+function parse_var(s, 	var) { var = parse_declaration(s); sub("export","",var); return trim(var); } \
+function parse_declaration(s) { match(s,/[^?=]*/); return substr(s,RSTART, RLENGTH); } \
+function parse_help(s) { match($$0,/[^#]*$$/); return trim(substr($$0,RSTART,RLENGTH)); } \
+${awk_utils}'
+endef
+
+define awk_utils
+' \
+function ltrim(s) { sub(/^[ \t\r\n]+/, "", s); return s } \
+function rtrim(s) { sub(/[ \t\r\n]+$$/, "", s); return s } \
+function trim(s) { return rtrim(ltrim(s)); } \
+function alert(label, txt) { print label " [" txt "]" } \
+'
 endef
 
 ###
 # Interactively generate a conf file from a template of the same basename and extension, .tpl.
 # If the variable is defined either by the environment or previous inclusion of the same file, 
 # the value will be offered as the default.
+
+# # #
+# Creates a config file from a tpl.
 #
 # Exports the variables to be replaced before calling the interactive shell script.
 #
-# Simply including the .conf file can trigger this rule if the file doesn't exist.
-#
-%.conf: | ${this-dir}prompt-for-configs.sh-is-exec
+%.conf:
 	@$(eval THEVARS := $(shell $(conf_get_var_names) < ${*}.tpl))
-	$(foreach var,${THEVARS},$(eval export ${var})) \
-	${this-dir}prompt-for-configs.sh ${*}.tpl ${@}
+	@$(foreach var,${THEVARS},$(eval export ${var})) \
+	$(interactive-config) ${*}.tpl
 
-%-is-exec:
-	chmod a+x ${*}
+%.conf-save:
+	@$(eval THEVARS := $(shell $(conf_get_var_names) < ${*}.tpl))
+	@$(foreach var,${THEVARS},$(eval export ${var})) \
+	$(REPLACE_TOKENS) <${*}.tpl >${*}.conf
 
+# # #
+# -Rr, doesn't load special vars or targets; 
+# -B forces re-building (the config files);
 reconfigure:
 	$(MAKE) -RrB ${CONFIG_INCLUDES}
 .PHONY: reconfigure
