@@ -157,7 +157,7 @@ reconfigure:
 # Shell command to replace {{TOKENs}} in a file
 # Copy a template and then replace the tokens in the copy.
 #
-REPLACE_TOKENS = perl -p -i -e 's%\{\{([^}]+)\}\}%defined $$ENV{$$1} ? $$ENV{$$1} : $$&%eg'
+REPLACE_TOKENS = perl -p -e 's%\{\{([^}]+)\}\}%defined $$ENV{$$1} ? $$ENV{$$1} : $$&%eg'
 
 .DEFAULT_GOAL := ${CACHED_DG}
 
