@@ -154,6 +154,20 @@ reconfigure:
 .PHONY: reconfigure
 
 # # #
+# Prompts to declare a new variable and append to a template.
+#
+add-config: 
+	@read -p 'File-name?' -r filename; \
+	while read -p 'Config Name?:' -r name ; do \
+		read -p 'Help text?' -r help; \
+		read -p 'export? [yes]' -r exp; \
+		prefix=$$(test -z "$${exp}" && echo 'export ' || echo ''); \
+		echo "$${prefix}$${name} = {{$${name}}}#$${help}" \
+		>> $${filename}.tpl; \
+	done; \
+	echo Generated config template: $${filename}.tpl
+
+# # #
 # Shell command to replace {{TOKENs}} in a file
 # Copy a template and then replace the tokens in the copy.
 #
