@@ -153,6 +153,9 @@ reconfigure:
 	$(MAKE) -RrB ${CONFIG_INCLUDES}
 .PHONY: reconfigure
 
+save-conf non-interactive: $(foreach conf,${CONFIG_INCLUDES},${conf}-save)
+.PHONY: noninteractive
+
 # # #
 # Prompts to declare a new variable and append to a template.
 #
