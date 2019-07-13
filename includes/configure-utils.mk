@@ -8,31 +8,33 @@
 #
 # IMPORTANT: each of your config files must have a template file (.tpl). Config files must have a .conf file-extension.
 #
-# Provide defaults for your project by including a .conf file, or include another defaults file.
-#
-# WARNING: escape spaces in paths in your config-include list. 
+# To declare defaults for your project, include a .conf file, or include another defaults file loaded before the config.
 #
 # SAMPLE: export PROJECT_ROOT ?= /var/www/# comments like this are used in user-prompts.
 #	prompt: export PROJECT_ROOT ( comments liek this are used in user-prompts. ) = [/var/www/]?
 #
 # TIP: include a trailing-slash when configuring paths. 
 # TIP: terminate paths with a hash/sharp to avoid the error of trailing-white-space.
+# WARNING: escape spaces in paths in your config-include list. 
 #
 # FEATURES:
 # Includes the files in the CONFIG_INCLUDES list.
 #
+# Generates a conf file from a template of the same basename and extension, .tpl. Simply including the .conf file can trigger this rule if the file doesn't exist. If a variable is defined either by the environment or previous inclusion of the same file, the value will be offered as the default.
+#
+# Can non-interactively update a config file with values from the environment.
+#
 # Set AUTO_INCLUDE_CONFS instead of CONFIG_INCLUDES to include files that have a .tpl file in conf/.
-# e.g. AUTO_INCLUDE_CONFS = true # i.e. empty is false
-#	if the files conf/project.tpl, conf/db.tpl exist:
-#	CONFIG_INCLUDES will contain conf/project.conf conf/db.conf
+# If the files conf/project.tpl, conf/db.tpl exist: CONFIG_INCLUDES will contain conf/project.conf conf/db.conf
+#
+# e.g. AUTO_INCLUDE_CONFS = true 
+# i.e. empty is false 
 #
 # Provides an implicit recipe for %.conf files. This causes missing configuration files to be automatically (and interactively) generated.
 #
 # Provides a target, "reconfigure" that will interactively prompt you to enter the config values. Since the config file is always loaded first, you can run configure multiple times, and existing configs will be loaded as default values.
 #
-# TIP: to generate a specific conf file, just make it!
-# e.g. make -B -f utils/configure-utils.mk  conf/db.conf
-# -B will force if you want to re-configure an existing file.
+# Use `make add-config` to easily add new configs to your template. Specify the basename of your config file, and your new variable will be appended to the template file.
 #
 # # #
 
