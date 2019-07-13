@@ -24,49 +24,45 @@
 # # #
 
 printf '\nGenerating Configuration of %s.\n' "$2"
-printf 'Continue? (Y/N) [Y]'
+printf '( Press Enter to continue. C to cancel. )'
 read -r yes
-if ( [ "$yes" = 'n' ] || [ "$yes" = 'N' ] || [ -n "$yes" ] ); then
+if ( [ -n "$yes" ] ); then
 	exit 0
 fi
 printf '\nLeave blank for default [value].\n'
 
+parse_vars_from_input() {
+	test "${conf_conf#*=}" = "$conf_conf" && return;	# discard lines that aren't assignments
+
+	conf_var_declaration=$(echo "$conf_conf" | sed -s 's/\([^=?]*\).*/\1/')
+	conf_var=${conf_var_declaration#*export} # remove 'export'
+	conf_var=$(echo "${conf_var}" | awk '{$1=$1}1') # trim spaces
+
+	conf_default=$(eval echo \"'$'$conf_var\\c\")
+	conf_default=$(echo "${conf_default}" | awk '{$1=$1}1') # trim spaces
+
+	conf_helptxt=$(echo "$conf_conf" | sed -s 's/[^#]*#*\([^#]*\)$/\1/')
+	test -n "$conf_helptxt" && conf_help="( $conf_helptxt )"	# show provided help
+}
+
 # get vars to set from the tpl:
-while IFS= read -r conf; do
-	test "${conf#*=}" = "$conf" && continue;	# discard lines that aren't assignments
-
-	var_declaration=$(echo "$conf" | sed -s 's/\([^=?]*\).*/\1/')
-	the_var=${var_declaration#*export} # remove 'export'
-	the_var=$(echo "${the_var}" | awk '{$1=$1}1') # trim spaces
-
-	default=$(eval echo -n \"'$'$the_var\")
-	default=$(echo "${default}" | awk '{$1=$1}1') # trim spaces
-
-	helptxt=$(echo "$conf" | sed -s 's/[^#]*#*\([^#]*\)$/\1/')
-	test -n "$helptxt" && help="($helptxt )"	# show provided help
+while IFS= read -r conf_conf; do
+	parse_vars_from_input
 	
-	echo -n ${var_declaration} ${help}= [${default}]?' '
-	read -r reply </dev/tty
-	if [ -z "$reply" ]; then
-		reply="$default"
+	echo ${conf_help} ${conf_var_declaration}? [${conf_default}]' \c'
+	read -r conf_reply </dev/tty
+	if [ -z "$conf_reply" ]; then
+		conf_reply="$conf_default"
 	fi
-	eval ${the_var}="'$reply'"
+	eval ${conf_var}="'$conf_reply'"
 done < "$1"
 
 
 printf '\nReview Changes:\n'
-while IFS= read -r conf; do
-	test "${conf#*=}" = "$conf" && continue;	# discard lines that aren't assignments
+while IFS= read -r conf_conf; do
+	parse_vars_from_input
 
-	var_declaration=$(echo "$conf" | sed -s 's/\([^=?]*\).*/\1/')
-	the_var=${var_declaration#*export} # remove 'export'
-	the_var=$(echo "${the_var}" | awk '{$1=$1}1') # trim spaces
-
-	helptxt=$(echo "$conf" | sed -s 's/[^#]*#*\([^#]*\)$/\1/')
-	test -n "$helptxt" && help="#$helptxt"	# show provided help
-	default=$(eval echo -n \"'$'$the_var\")
-
-	echo "$var_declaration" = "$default" "$help"
+	echo "$conf_var_declaration" = "$conf_default" "$conf_help"
 done < "$1"
 
 printf '\nCommit these changes? (Y/N) [N]'
