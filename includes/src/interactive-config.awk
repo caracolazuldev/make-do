@@ -21,17 +21,16 @@ BEGIN {
 
 		prompt("\nReview Changes:\n"); 
 		for (i in review) { prompt(review[i] "\n"); }
-		
+
 		prompt("\nIs this correct? [Y/n]"); getline user < "-";
 		if ( user == "" ) { exit 2; }
 
 		confirmed = ( user == "Y" || user == "y" );
 
 		if ( confirmed ) {
-			close(FILENAME); print "" > CONF_FILE;
-
+			# reset line pointer;	# truncate output file;
+			close(FILENAME); 		print "" > CONF_FILE;
 			while ( (getline line < FILENAME) > 0 ) { emit_config(line); }
-
 			prompt("Configuration saved.\n\n");
 		}
 	}
@@ -39,7 +38,7 @@ BEGIN {
 }
 
 function parse_tpl() {
-	close(FILENAME);
+	close(FILENAME); # reset filepointer
 	while ( (getline line < FILENAME) > 0 ) {
 		if (match(line,/=/)) {
 			prompt_for_var(line);
@@ -51,7 +50,7 @@ function prompt_for_var(line) {
 	declaration = parse_declaration(line);
 	the_var = parse_var(line);
 	default_val = trim(
-		((configs[the_var]) ? configs[the_var] : ENVIRON[the_var])
+		( (configs[the_var]) ? configs[the_var] : ENVIRON[the_var] )
 	);
 	helptext = parse_help(line);
 
