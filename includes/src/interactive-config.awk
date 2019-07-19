@@ -9,44 +9,78 @@
 #
 
 BEGIN {
-	prompt(sprintf("\nGenerating Configuration of %s.\n", WRITE_CONFIG)); prompt("( Press Enter to continue. C to cancel. )\n") ;
-	getline user < "-" ; if ( user ) { bailed = 2; exit; }
+	FILENAME = ARGV[1];
+	CONF_FILE = (ARGC > 2) ? ARGV[2] : "/dev/fd/1";
 
-	prompt("\nLeave blank for default [value].\n") ;
+	prompt("( Press Enter to continue. C to cancel. )\n") ;
+	getline user < "-" ; if ( user ) { exit 2; }
+
+	while ( ! confirmed ) {
+		prompt("Leave blank for default [value].\n") ;
+		parse_tpl();
+
+		prompt("\nReview Changes:\n"); 
+		for (i in review) { prompt(review[i] "\n"); }
+		
+		prompt("\nIs this correct? [Y/n]"); getline user < "-";
+		if ( user == "" ) { exit 2; }
+
+		confirmed = ( user == "Y" || user == "y" );
+
+		if ( confirmed ) {
+			close(FILENAME); print "" > CONF_FILE;
+
+			while ( (getline line < FILENAME) > 0 ) { emit_config(line); }
+
+			prompt("Configuration saved.\n\n");
+		}
+	}
+	exit;
 }
-/=/ {
-	declaration = parse_declaration($0);
-	the_var = parse_var($0);
-	default_val = trim(ENVIRON[the_var]);
-	helptext = parse_help($0);
 
-	prompt("("helptext") " declaration "? [" default_val "] "); getline user < "-";
-	configs[the_var] = (user) ? user : default_val ;
-	review[the_var] = sprintf("%s = %s # %s", declaration, configs[the_var], helptext) ;
-}
-END {
-	if ( bailed ) { exit bailed }
-
-	prompt("\nReview Changes:\n"); for (i in review) { prompt(review[i]); }
-
-	prompt("\nCommit these changes? [Y/n]"); getline user < "-";
-	if ( user == "Y" || user == "y" ) {
-		while ( (getline line < FILENAME) > 0 ) { emit_config(line); }
+function parse_tpl() {
+	close(FILENAME);
+	while ( (getline line < FILENAME) > 0 ) {
+		if (match(line,/=/)) {
+			prompt_for_var(line);
+		}
 	}
 }
 
+function prompt_for_var(line) {
+	declaration = parse_declaration(line);
+	the_var = parse_var(line);
+	default_val = trim(
+		((configs[the_var]) ? configs[the_var] : ENVIRON[the_var])
+	);
+	helptext = parse_help(line);
+
+	prompt("("helptext") " declaration "? [" default_val "] ");
+	getline user < "-";
+
+	configs[the_var] = (user) ? user : default_val ;
+	review[the_var] = sprintf("%s = %s# %s", declaration, configs[the_var], helptext) ;
+}
+
+function parse_var(s, 	var) {
+	var = parse_declaration(s);
+	sub("export","",var); return trim(var);
+}
+function parse_declaration(s) {
+	match(s,/[^?=]*/); return substr(s,RSTART, RLENGTH); 
+}
+function parse_help(s) {
+	match(s,"[^#]*$");
+	return trim(substr(s,RSTART,RLENGTH));
+}
 function emit_config(line) {
 	if ( match(line,/=/)) {
 		the_var = parse_var(line);
-		token = "/{{" the_var "}}/";
+		token = "\\{\\{" the_var "\\}\\}";
 		gsub( token, configs[the_var], line);
 	} 
-	print line;
+	print line >> CONF_FILE;
 }
-
-function parse_var(s, 	var) { var = parse_declaration(s); sub("export","",var); return trim(var); }
-function parse_declaration(s) { match(s,/[^?=]*/); return substr(s,RSTART, RLENGTH); }
-function parse_help(s) { match($0,"[^#]*$");	return trim(substr($0,RSTART,RLENGTH)); }
 
 # # #
 # Utils
