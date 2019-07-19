@@ -4,7 +4,7 @@
 #
 
 {
-    if ( match($0, /^#/) ) { next; }
+    if ( match($0, /^[[:space:]]*#/) ) { next; }
     gsub(/[\n\r]?$/, "");
     gsub(/[\t]+/, "");
     gsub(/[[:blank:]]{2,}/, " ");
@@ -12,6 +12,8 @@
 }
 
 # # #
+#
+# TODO: comments 
 # TODO: can this be even smarter?
 # 
 #   file:///home/mzd/work/drafting/awk/Statements_002fLines.html#Statements_002fLines
