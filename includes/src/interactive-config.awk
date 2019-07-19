@@ -85,7 +85,7 @@ function emit_config(line) {
 # Utils
 # # #
 function ltrim(s) { sub(/^[ \t\r\n]+/, "", s); return s }
-function rtrim(s) { sub(/[ \t\r\n]+$$/, "", s); return s }
+function rtrim(s) { sub(/[ \t\r\n]+$/, "", s); return s }
 function trim(s) { return rtrim(ltrim(s)); }
-function alert(label, txt) { print label " [" txt "]" }
+function alert(label, txt) { printf "\n%s [%s]", label, txt | "cat 1>&2" }
 function prompt(s) { printf "%s", s | "cat 1>&2" }

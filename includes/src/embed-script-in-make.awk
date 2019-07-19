@@ -57,7 +57,7 @@ END {
     }
 }
 
-function rtrim(s) { sub(/[ \t\r\n]+$$/, "", s); return s }
+function rtrim(s) { sub(/[ \t\r\n]+$/, "", s); return s }
 
 # read an entire file at once
 function readfile(file,     contents)
