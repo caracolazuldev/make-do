@@ -80,13 +80,13 @@ include ${CONFIG_INCLUDES}
 recipe-escape:
 	$(eval INFILE ?= ${--in})
 	$(eval OUTFILE ?= ${--out})
-	$(AWK) '${recipe-escape.awk}' <${INFILE} >${OUTFILE};
+	$(recipe-escape.awk) <${INFILE} >${OUTFILE};
 .PHONY: recipe-escape
 
 recipe-unescape:
 	$(eval INFILE ?= ${--in})
 	$(eval OUTFILE ?= ${--out})
-	$(AWK) '${recipe-unescape.awk}' <${INFILE} >${OUTFILE};
+	${recipe-unescape.awk} <${INFILE} >${OUTFILE};
 .PHONY: recipe-unescape
 
 recipe-minify:
@@ -94,7 +94,7 @@ recipe-minify:
 	$(eval OUTFILE ?= ${--out})
 	$(info processing ${INFILE})
 	@echo 
-	@$(AWK) '${minify.awk}' <${INFILE} | $(AWK) '${recipe-escape.awk}'
+	@$(minify.awk) <${INFILE} | $(recipe-escape.awk) >${OUTFILE}
 
 # # #
 # Creates a config file from a tpl.
@@ -103,9 +103,10 @@ recipe-minify:
 # shell script.
 #
 %.conf:
+	$(info Generating configuration of ${@}.)
 	@$(eval THEVARS := $(shell $(parse-conf-vars.awk) < ${*}.tpl))
 	@$(foreach var,${THEVARS},$(eval export ${var})) \
-	WRITE_CONFIG = "${@}" $(interactive-config.awk) ${*}.tpl
+	$(interactive-config.awk) ${*}.tpl ${@}
 
 %.conf-save:
 	@$(eval THEVARS := $(shell $(parse-conf-vars.awk) < ${*}.tpl))
@@ -116,7 +117,7 @@ recipe-minify:
 # -Rr, doesn't load special vars or targets; 
 # -B forces re-building (the config files);
 reconfigure:
-	$(MAKE) -RrB ${CONFIG_INCLUDES}
+	@$(MAKE) -RrBs ${CONFIG_INCLUDES}
 .PHONY: reconfigure
 
 save-conf non-interactive: $(foreach conf,${CONFIG_INCLUDES},${conf}-save)
@@ -158,7 +159,7 @@ define parse-conf-vars.awk
 $(AWK) '/=/ { print parse_var($$0); }function parse_var(s, var) { var = parse_declaration(s); sub("export","",var); return trim(var); }function parse_declaration(s) { match(s,/[^?=]*/); return substr(s,RSTART, RLENGTH); }function ltrim(s) { sub(/^[ \t\r\n]+/, "", s); return s }function rtrim(s) { sub(/[ \t\r\n]+$$/, "", s); return s }function trim(s) { return rtrim(ltrim(s)); }function alert(label, txt) { print label " [" txt "]" } '
 endef
 define interactive-config.awk
-$(AWK) 'BEGIN {prompt(sprintf("\nGenerating Configuration of %s.\n", WRITE_CONFIG)); prompt("( Press Enter to continue. C to cancel. )\n") ;getline user < "-" ; if ( user ) { bailed = 2; exit; }prompt("\nLeave blank for default [value].\n") ;}/=/ {declaration = parse_declaration($$0);the_var = parse_var($$0);default_val = trim(ENVIRON[the_var]);helptext = parse_help($$0);prompt("("helptext") " declaration "? [" default_val "] "); getline user < "-";configs[the_var] = (user) ? user : default_val ;review[the_var] = sprintf("%s = %s # %s", declaration, configs[the_var], helptext) ;}END {if ( bailed ) { exit bailed }prompt("\nReview Changes:\n"); for (i in review) { prompt(review[i]); }prompt("\nCommit these changes? [Y/n]"); getline user < "-";if ( user == "Y" || user == "y" ) {while ( (getline line < FILENAME) > 0 ) { emit_config(line); }}}function emit_config(line) {if ( match(line,/=/)) {the_var = parse_var(line);token = "/{{" the_var "}}/";gsub( token, configs[the_var], line);} print line;}function parse_var(s, var) { var = parse_declaration(s); sub("export","",var); return trim(var); }function parse_declaration(s) { match(s,/[^?=]*/); return substr(s,RSTART, RLENGTH); }function parse_help(s) { match($$0,"[^#]*$$");return trim(substr($$0,RSTART,RLENGTH)); }function ltrim(s) { sub(/^[ \t\r\n]+/, "", s); return s }function rtrim(s) { sub(/[ \t\r\n]+$$$$/, "", s); return s }function trim(s) { return rtrim(ltrim(s)); }function alert(label, txt) { print label " [" txt "]" }function prompt(s) { printf "%s", s | "cat 1>&2" } '
+$(AWK) 'BEGIN {FILENAME = ARGV[1];CONF_FILE = (ARGC > 2) ? ARGV[2] : "/dev/fd/1";prompt("( Press Enter to continue. C to cancel. )\n") ;getline user < "-" ; if ( user ) { exit 2; }while ( ! confirmed ) {prompt("Leave blank for default [value].\n") ;parse_tpl();prompt("\nReview Changes:\n"); for (i in review) { prompt(review[i] "\n"); }prompt("\nIs this correct? [Y/n]"); getline user < "-";if ( user == "" ) { exit 2; }confirmed = ( user == "Y" || user == "y" );if ( confirmed ) {close(FILENAME); print "" > CONF_FILE;while ( (getline line < FILENAME) > 0 ) { emit_config(line); }prompt("Configuration saved.\n\n");}}exit;}function parse_tpl() {close(FILENAME);while ( (getline line < FILENAME) > 0 ) {if (match(line,/=/)) {prompt_for_var(line);}}}function prompt_for_var(line) {declaration = parse_declaration(line);the_var = parse_var(line);default_val = trim(((configs[the_var]) ? configs[the_var] : ENVIRON[the_var]));helptext = parse_help(line);prompt("("helptext") " declaration "? [" default_val "] ");getline user < "-";configs[the_var] = (user) ? user : default_val ;review[the_var] = sprintf("%s = %s# %s", declaration, configs[the_var], helptext) ;}function parse_var(s, var) {var = parse_declaration(s);sub("export","",var); return trim(var);}function parse_declaration(s) {match(s,/[^?=]*/); return substr(s,RSTART, RLENGTH); }function parse_help(s) {match(s,"[^#]*$$");return trim(substr(s,RSTART,RLENGTH));}function emit_config(line) {if ( match(line,/=/)) {the_var = parse_var(line);token = "\\{\\{" the_var "\\}\\}";gsub( token, configs[the_var], line);} print line >> CONF_FILE;}function ltrim(s) { sub(/^[ \t\r\n]+/, "", s); return s }function rtrim(s) { sub(/[ \t\r\n]+$$$$/, "", s); return s }function trim(s) { return rtrim(ltrim(s)); }function alert(label, txt) { print label " [" txt "]" }function prompt(s) { printf "%s", s | "cat 1>&2" } '
 endef
 define recipe-escape.awk
 $(AWK) '{ gsub(/\$$/, "$$$$"); gsub(/'\''/, "'\''\\'\'''\''"); print $$$$0 " \\" ;} '
@@ -167,10 +168,10 @@ define recipe-unescape.awk
 $(AWK) '{ gsub(/[\$$]{2}/, "$$"); gsub(/[[:blank:]]?\\[[:blank:]]?$$/, ""); gsub(/'\''\'\'''\''/, "'\''"); print ; } '
 endef
 define minify.awk
-$(AWK) '{ if ( match($$0, /^#/) ) { next; } gsub(/[\n\r]?$$/, ""); gsub(/[\t]+/, ""); gsub(/[[:blank:]]{2,}/, " "); printf "%s", $$0; } '
+$(AWK) '{ if ( match($$0, /^[[:space:]]*#/) ) { next; } gsub(/[\n\r]?$$/, ""); gsub(/[\t]+/, ""); gsub(/[[:blank:]]{2,}/, " "); printf "%s", $$0; } '
 endef
 define embed-script-in-make.awk
-$(AWK) 'BEGIN { DEFINE_BODY = readfile(ENVIRON["SOURCE_FILE"]);  DEFINE_NAME = ENVIRON["DEFINE_NAME"]; if (! DEFINE_NAME ) { DEFINE_NAME = ENVIRON["SOURCE_FILE"]; } # we expect recipe-escape.awk to include a trailing-backslash: DEFINE_BODY = rtrim(DEFINE_BODY); gsub(/\\$$/, "", DEFINE_BODY); # wrap the source with an awk invocation.  DEFINE_BODY = "$$(AWK) '\''" DEFINE_BODY "'\''";  start_define = "define[[:blank:]]+" DEFINE_NAME; definition = "define " DEFINE_NAME "\n" DEFINE_BODY "\nendef";}/define/,/^endef/ { if ( $$0 ~ start_define ) { found = replacing = 1; } if ( replacing && $$0 ~ /^endef/ ) { replacing = 0; print definition; next; }}{ if (! replacing ) { print } }END { if ( ! found ) { print "\n" definition; }}function rtrim(s) { sub(/[ \t\r\n]+$$$$/, "", s); return s }function readfile(file, contents){ while ((getline line < file) > 0) contents = contents line close(file) return contents} '
+$(AWK) 'BEGIN { DEFINE_BODY = readfile(ENVIRON["SOURCE_FILE"]);  DEFINE_NAME = ENVIRON["DEFINE_NAME"]; if (! DEFINE_NAME ) { DEFINE_NAME = ENVIRON["SOURCE_FILE"]; } DEFINE_BODY = rtrim(DEFINE_BODY); gsub(/\\$$/, "", DEFINE_BODY);  DEFINE_BODY = "$$(AWK) '\''" DEFINE_BODY "'\''";  start_define = "define[[:blank:]]+" DEFINE_NAME; definition = "define " DEFINE_NAME "\n" DEFINE_BODY "\nendef";}/define/,/^endef/ { if ( $$0 ~ start_define ) { found = replacing = 1; } if ( replacing && $$0 ~ /^endef/ ) { replacing = 0; print definition; next; }}{ if (! replacing ) { print } }END { if ( ! found ) { print "\n" definition; }}function rtrim(s) { sub(/[ \t\r\n]+$$$$/, "", s); return s }function readfile(file, contents){ while ((getline line < file) > 0) contents = contents line close(file) return contents} '
 endef
 define replace.awk
 $(AWK) 'BEGIN { BLOCK_START = ENVIRON["SEARCH"]; BLOCK_END = ENVIRON["BLOCK_END"]; if ( ! BLOCK_END ) { BLOCK_END = BLOCK_START; } REPLACE = ENVIRON["REPLACE"];}BLOCK_START,BLOCK_END { if ( $$0 ~ BLOCK_START ) { replacing = 1; } if ( $$0 ~ BLOCK_START && $$0 ~ BLOCK_END ) { if ( BLOCK_START == BLOCK_END ) { search = BLOCK_START; } else { search = BLOCK_START ".*" BLOCK_END; } gsub(search, REPLACE); replacing = 0; } if ( replacing && $$0 ~ BLOCK_END ) { replacing = 0; print REPLACE; next; }}{ if (! replacing ) { print } } '
