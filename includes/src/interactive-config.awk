@@ -10,24 +10,25 @@
 
 BEGIN {
 	FILENAME = ARGV[1];
-	CONF_FILE = (ARGC > 2) ? ARGV[2] : "/dev/fd/1";
+	CONF_FILE = (ARGC > 2) ? ARGV[2] : "/dev/fd/2";
 
 	prompt("( Press Enter to continue. C to cancel. )\n") ;
-	getline user < "-" ; if ( user ) { exit 2; }
+	if ( ! getline usrReply < "/dev/fd/1" || usrReply ) { exit 0; }
 
-	while ( ! confirmed ) {
-		prompt("Leave blank for default [value].\n") ;
-		parse_tpl();
+	blnYes = 0;
+	while ( ! blnYes ) {
+		get_conf_values();
 
 		prompt("\nReview Changes:\n"); 
 		for (i in review) { prompt(review[i] "\n"); }
 
-		prompt("\nIs this correct? [Y/n]"); getline user < "-";
-		if ( user == "" ) { exit 2; }
+		usrReply = "";
+		prompt("\nIs this correct? [Y/n]");
+		if ( getline usrReply < "/dev/fd/1" == 0 ) { exit 0; }
 
-		confirmed = ( user == "Y" || user == "y" );
+		blnYes = ( usrReply == "Y" || usrReply == "y" );
 
-		if ( confirmed ) {
+		if ( blnYes ) {
 			# reset line pointer;	# truncate output file;
 			close(FILENAME); 		print "" > CONF_FILE;
 			while ( (getline line < FILENAME) > 0 ) { emit_config(line); }
@@ -37,7 +38,9 @@ BEGIN {
 	exit;
 }
 
-function parse_tpl() {
+function get_conf_values() {
+	prompt("Leave blank for default [value].\n") ;
+
 	close(FILENAME); # reset filepointer
 	while ( (getline line < FILENAME) > 0 ) {
 		if (match(line,/=/)) {
@@ -55,9 +58,9 @@ function prompt_for_var(line) {
 	helptext = parse_help(line);
 
 	prompt("("helptext") " declaration "? [" default_val "] ");
-	getline user < "-";
+	if ( ! getline usrReply < "/dev/fd/1" ) { exit 0; }
 
-	configs[the_var] = (user) ? user : default_val ;
+	configs[the_var] = (usrReply) ? usrReply : default_val ;
 	review[the_var] = sprintf("%s = %s# %s", declaration, configs[the_var], helptext) ;
 }
 
