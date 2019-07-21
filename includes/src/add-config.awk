@@ -1,22 +1,27 @@
 
 BEGIN {
-	while ( "true" ) {
-		filename = "";
-		prompt("\nFile-name? "); getline filename <"-";
-		if ( filename == "" ) { exit; }
+	STDIN = "/dev/fd/1";
+	filename = "";
+	prompt("\nFile-name? "); getline filename <STDIN;
+	if ( filename == "" ) { exit; }
 
-		if ( match(filename,/\.conf$|\.tpl$/) ) {
-			gsub(/\.conf$|\.tpl$/, "", filename); # remove suffix
-		}
-		filename = filename ".tpl";
-		
-		prompt("Config Name? "); getline name <"-";
-		prompt("Help text? "); getline help <"-";
-		prompt("export? [yes] "); getline noex <"-";
+	if ( match(filename,/\.conf$|\.tpl$/) ) {
+		gsub(/\.conf$|\.tpl$/, "", filename); # remove suffix
+	}
+	filename = filename ".tpl";
+
+	while ( 1 ) {
+		name = "";
+		prompt("\nConfig Name? "); getline name <STDIN;
+		if ( name == "" ) { exit; }
+
+		prompt("Help text? "); getline help <STDIN;
+		prompt("export? [yes] "); getline noex <STDIN;
+
 		prefix = (noex) ? "" : "export ";
 
 		print prefix name " = {{" name "}}#" help >> filename;
-		prompt("Generated config template: " filename);
+		prompt(prefix name " = {{" name "}}#" help " >>" filename);
 	}
 	exit;
 }
