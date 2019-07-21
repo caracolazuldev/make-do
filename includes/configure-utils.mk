@@ -95,6 +95,7 @@ recipe-minify:
 	$(info processing ${INFILE})
 	@echo 
 	@$(minify.awk) <${INFILE} | $(recipe-escape.awk) >${OUTFILE}
+.PHONY: recipe-minify
 
 # # #
 # Creates a config file from a tpl.
@@ -128,6 +129,7 @@ save-conf non-interactive: $(foreach conf,${CONFIG_INCLUDES},${conf}-save)
 #
 add-config: 
 	@${add-config.awk}
+.PHONY: add-config
 
 # # #
 # Shell command to replace {{TOKENs}} in a file
