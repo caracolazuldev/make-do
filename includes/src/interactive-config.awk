@@ -10,10 +10,10 @@
 
 BEGIN {
 	FILENAME = ARGV[1];
-	CONF_FILE = (ARGC > 2) ? ARGV[2] : "/dev/fd/2";
+	CONF_FILE = (ARGC > 2) ? ARGV[2] : "/dev/fd/1";
 
 	prompt("( Press Enter to continue. C to cancel. )\n") ;
-	if ( ! getline usrReply < "/dev/fd/1" || usrReply ) { exit 0; }
+	if ( ! getline usrReply < "-" || usrReply ) { exit 0; }
 
 	blnYes = 0;
 	while ( ! blnYes ) {
@@ -24,7 +24,7 @@ BEGIN {
 
 		usrReply = "";
 		prompt("\nIs this correct? [Y/n]");
-		if ( getline usrReply < "/dev/fd/1" == 0 ) { exit 0; }
+		if ( getline usrReply < "-" == 0 ) { exit 0; }
 
 		blnYes = ( usrReply == "Y" || usrReply == "y" );
 
@@ -58,7 +58,7 @@ function prompt_for_var(line) {
 	helptext = parse_help(line);
 
 	prompt("("helptext") " declaration "? [" default_val "] ");
-	if ( ! getline usrReply < "/dev/fd/1" ) { exit 0; }
+	if ( ! getline usrReply < "-" ) { exit 0; }
 
 	configs[the_var] = (usrReply) ? usrReply : default_val ;
 	review[the_var] = sprintf("%s = %s# %s", declaration, configs[the_var], helptext) ;
