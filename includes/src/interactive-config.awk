@@ -72,8 +72,7 @@ function parse_declaration(s) {
 	match(s,/[^?=]*/); return substr(s,RSTART, RLENGTH); 
 }
 function parse_help(s) {
-	match(s,"[^#]*$");
-	return trim(substr(s,RSTART,RLENGTH));
+	match(s,"[^#}]+$"); return trim(substr(s,RSTART,RLENGTH));
 }
 function emit_config(line) {
 	if ( match(line,/=/)) {
