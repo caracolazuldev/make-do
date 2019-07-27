@@ -17,10 +17,7 @@ BEGIN {
 
 	blnYes = 0;
 	while ( ! blnYes ) {
-		get_conf_values();
-
-		prompt("\nReview Changes:\n"); 
-		for (i in review) { prompt(review[i] "\n"); }
+		prompt("\nReview Changes:" get_conf_values() "\n"); 
 
 		usrReply = "";
 		prompt("\nIs this correct? [Y/n]");
@@ -40,13 +37,14 @@ BEGIN {
 
 function get_conf_values() {
 	prompt("Leave blank for default [value].\n") ;
-
+	preview = "";
 	close(FILENAME); # reset filepointer
 	while ( (getline line < FILENAME) > 0 ) {
 		if (match(line,/=/)) {
-			prompt_for_var(line);
+			preview = preview prompt_for_var(line);
 		}
 	}
+	return preview;
 }
 
 function prompt_for_var(line) {
@@ -56,12 +54,13 @@ function prompt_for_var(line) {
 		( (configs[the_var]) ? configs[the_var] : ENVIRON[the_var] )
 	);
 	helptext = parse_help(line);
+	if (helptext) { helptext = "(" helptext ") "; }
 
-	prompt("("helptext") " declaration "? [" default_val "] ");
+	prompt( helptext declaration "? [" default_val "] ");
 	if ( ! getline usrReply < "-" ) { exit 0; }
 
 	configs[the_var] = (usrReply) ? usrReply : default_val ;
-	review[the_var] = sprintf("%s = %s# %s", declaration, configs[the_var], helptext) ;
+	return sprintf("\n%s = %s# %s", declaration, configs[the_var], helptext) ;
 }
 
 function parse_var(s, 	var) {
