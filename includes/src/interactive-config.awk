@@ -4,7 +4,7 @@
 # Takes a template (.tpl) on standard-input and outputs contents
 # for a configuration (.conf) file.
 #
-# Tokens are recognized by {{double-curl-braces}}.
+# Tokens are recognized by {{double-curly-braces}}.
 # Token replacements are the values from variables in the environment.
 #
 
@@ -35,6 +35,11 @@ BEGIN {
 	exit;
 }
 
+# # #
+# Loop the input file (tpl);
+# Call prompt_for_var();
+# Accumulate and return the preview;
+#
 function get_conf_values() {
 	prompt("Leave blank for default [value].\n") ;
 	preview = "";
@@ -47,6 +52,12 @@ function get_conf_values() {
 	return preview;
 }
 
+# # #
+# Read a line of text.
+# Prompt user for new values.
+# Add to the config array.
+# Return a preview of the new var initialization statement.
+#
 function prompt_for_var(line) {
 	declaration = parse_declaration(line);
 	the_var = parse_var(line);
@@ -77,7 +88,7 @@ function emit_config(line) {
 	if ( match(line,/=/)) {
 		the_var = parse_var(line);
 		token = "\\{\\{" the_var "\\}\\}";
-		gsub( token, configs[the_var], line);
+		gsub( token, configs[the_var], line );
 	} 
 	print line >> CONF_FILE;
 }
