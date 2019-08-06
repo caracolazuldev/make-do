@@ -20,8 +20,8 @@ BEGIN {
 
 		prefix = (noex) ? "" : "export ";
 
-		print prefix name " ?= {{" name "}}#" help >> filename;
-		prompt(prefix name " ?= {{" name "}}#" help " >>" filename);
+		print prefix name " ?= {{" name "}}# " help >> filename;
+		prompt(prefix name " ?= {{" name "}}# " help " >>" filename);
 	}
 	exit;
 }
