@@ -26,7 +26,7 @@ fetch: $(foreach repo, ${REPOS}, ${repo}-fetch)
 %-status:
 	@ echo
 	@ echo ' - ' git status ${*} ' - '
-	@ git -C "${*}" status --short
+	@ git -C "${*}" status --short --branch
 
 status: $(foreach repo, ${REPOS}, ${repo}-status)
 
