@@ -1,62 +1,35 @@
-# Configure directory locations.
-# WARNING: these values will not update paths in the scripts themselves.
-# Patches welcome.
-#
-cmd_path ?= /usr/local/bin
-include_file_path ?= /usr/local/include
-install_dir ?= ${include_file_path}/make-do
-THIS_DIR := $(realpath $(dir $(firstword ${MAKEFILE_LIST})))
+-include mdo-help.mk
 
-all: uninstall install
+MAKE_INCLUDES_PATH ?= /usr/local/include/#
+DEV_INSTALL ?= ${--dev}# link instead of deploy files
 
-.PHONY: completions
-completions:
-	cp ${THIS_DIR}/.completions /etc/bash_completion.d/make-do
-	cp ${THIS_DIR}/mdo-util/.completions /etc/bash_completion.d/mdo-util
-	chmod a+r /etc/bash_completion.d/mdo-util
-	chmod a+r /etc/bash_completion.d/make-do
-	@ echo To enable mdo completions for this login session,
-	@ echo source /etc/bash_completion.d/\*
+MDO_INCLUDES := $(shell find includes -name 'mdo-*.mk' | sed 's/includes\///g')
 
-${include_file_path}/make-do.mk:
-	cp ${THIS_DIR}/includes/make-do.mk ${include_file_path}/make-do.mk
+default: uninstall
 
-${install_dir}: ${include_file_path}/make-do.mk
-	cp -a ${THIS_DIR} ${install_dir}
-	- rm ${install_dir}/.git -rf
-	chmod -R a+x ${install_dir}
+define install-library
+	cp includes/${@} ${MAKE_INCLUDES_PATH}${@}
+endef
 
-# ${install_dir} via links
-.PHONY: dev-library
-dev-library:
-	- test -L ${install_dir} || ln -s ${THIS_DIR} ${install_dir}
-	- test -L ${include_file_path}/make-do.mk || ln -s ${THIS_DIR}/includes/make-do.mk ${include_file_path}/make-do.mk
+define link-library
+	test -L ${MAKE_INCLUDES_PATH}${@} || \
+	ln -s $$(pwd)/includes/${@} ${MAKE_INCLUDES_PATH}${@}
+endef
 
-.PHONY: generate-mdo-util
-generate-mdo-util: ${install_dir}
-	- rm -f ${install_dir}/mdo-util/mdo-util
-	$(MAKE) -C ${install_dir}/mdo-util -f ${install_dir}/mdo-util/generate-cmd.mk
+define rm-library
+	- test -f ${MAKE_INCLUDES_PATH}${*} && rm ${MAKE_INCLUDES_PATH}${*}
+endef
 
-install: ${install_dir} generate-mdo-util completions
-	-@ ln -s ${install_dir}/mdo-util/mdo-util ${cmd_path}/mdo-util
-	-@ ln -s ${install_dir}/mdo ${cmd_path}/mdo
-	chmod -R a+x ${install_dir}
+define unlink-library
+	- test -L ${MAKE_INCLUDES_PATH}${*} && unlink ${MAKE_INCLUDES_PATH}${*}
+endef
 
-dev-install: dev-library install
+mdo-%.mk:
+	$(if ${DEV_INSTALL},$(link-library),$(install-library))
 
-.PHONY: uninstall-completions
-uninstall-completions:
-	rm -f /etc/bash_completion.d/mdo-util
-	rm -f /etc/bash_completion.d/make-do
+uninstall-%:
+	$(if ${DEV_INSTALL},$(unlink-library),$(rm-library))
 
-.PHONY: uninstall-library
-uninstall-library:
-	@# unink if dev-install
-	- test -L ${install_dir} && unlink ${install_dir}
-	- test -d ${install_dir} && rm -r ${install_dir}
-	- unlink ${include_file_path}/make-do.mk
+install: ${MDO_INCLUDES}
 
-.PHONY: uninstall
-uninstall: uninstall-completions uninstall-library
-	rm -rf ${cmd_path}/mdo
-	rm -rf ${cmd_path}/mdo-util
+uninstall: $(foreach inc,${MDO_INCLUDES},uninstall-${inc})
