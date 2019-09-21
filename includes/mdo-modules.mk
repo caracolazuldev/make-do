@@ -1,4 +1,17 @@
-# Set some expectations and include general utils
+# # #
+#
+# Module Framework 
+# (Deprecated? - needs work)
+#
+# Create functional units (modules) of make scripts.
+# Eases keeping build directories separate from build-scripts.
+#
+# Adds declared modules as targets to the Makefile that includes this library.
+# This hides sub-targets from the top-level Makefile, providing some order.
+#
+# Includes a system for providing default configuration values.
+# TODO: reconcile configuration features with mdo-config.mk library.
+#
 
 # use checkbashisms to validate your scripts for use with sh.
 export SHELL := sh
@@ -14,10 +27,6 @@ export SHELL := sh
 THIS_DIR := $(realpath $(dir $(firstword $(MAKEFILE_LIST))))
 #$(info THIS_DIR $(THIS_DIR))
 #$(info MAKEFILE_LIST $(MAKEFILE_LIST))
-
-MAKE_DO_INSTALL := $(realpath $(dir $(lastword $(MAKEFILE_LIST))))/make-do
-
-#$(info MAKE_DO_INSTALL $(MAKE_DO_INSTALL))
 
 ###
 # Load files containing default variable assignments.
@@ -53,13 +62,3 @@ $(MODULES):
 .DEFAULT_GOAL :=
 
 # Do Not define any targets below this point.
-
-# not quite what we were going for.
-# put enough effort, that maybe someday it will be useful??
-#define init-this-dir :=
-#$(realpath $(dir $(subst $(lastword $(MAKEFILE_LIST)), ,$(MAKEFILE_LIST) ) ) )
-#endef
-
-# END Prevent re-loading make-do
-#endif
-#MDO_LOADED := TRUE
