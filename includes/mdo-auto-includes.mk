@@ -1,4 +1,5 @@
 ######
+# DEPRECATED: it's good to declare your dependencies.
 #
 # Magic make, looks for *.mk files in sub-directories and includes them.
 # Default target just lists includes.
