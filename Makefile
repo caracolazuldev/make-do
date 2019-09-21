@@ -5,7 +5,7 @@ DEV_INSTALL ?= ${--dev}# link instead of deploy files
 
 MDO_INCLUDES := $(shell find includes -name 'mdo-*.mk' | sed 's/includes\///g')
 
-default: uninstall
+default: help
 
 define install-library
 	cp includes/${@} ${MAKE_INCLUDES_PATH}${@}
