@@ -49,13 +49,6 @@ $(MODULES):
 #ifneq ( $(MDO_LOADED), TRUE)
 
 ###
-# Features
-###
-
-include $(MAKE_DO_INSTALL)/includes/require-env.mk
-include $(MAKE_DO_INSTALL)/includes/cli.mk
-
-###
 # Reset the default goal/target so above targets don't interfere with expectations.
 .DEFAULT_GOAL :=
 
