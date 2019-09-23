@@ -1,4 +1,5 @@
-define HELP_TEXT
+
+define DOCUMENTATION :=
 
 # Utilities for using and managing environment configuration files.
 Automatically includes files with both 
@@ -15,14 +16,16 @@ this file is executed.
 
 Write a make recipe to interactively generate a file from any template
 using the make function, $(interactive-config.awk)
-	`$(interactive-config.awk) template filename`
+	`$$(interactive-config.awk) template filename`
 
 If a variable is defined in the environment, the value will be 
 offered as the default. Since the config file is always loaded first, 
 existing configs will be loaded as default values.
 
 Non-interactively replace {{TOKEN}}'s in a file:
-	`${REPLACE_TOKENS} < file.in > file.out`
+	`$${REPLACE_TOKENS} < file.in > file.out`
+or
+	`$${REPLACE_TOKENS} -i ${@}`
 
 Provides an implicit recipe for `%.conf` files. This causes missing
 configuration files to be automatically (and interactively) generated.
