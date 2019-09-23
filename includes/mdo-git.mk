@@ -1,26 +1,43 @@
 include mdo-require.mk
 
-$(call require-env,GIT_REPOS)
+define HELP_TEXT
+ - Git Repos -
+ COMMANDS
+	- clone
+ 	- status
+	- branch
+	- fetch
+	- pull
+	- logs
 
-# # #
-# This is not very mature: likely to change
-#
-# Requires a variable, ${GIT_REPOS} that is a space-delimited list of repo names (do not include '.git').
-#
-# Executes common git commands for each configured repo; e.g. to get the 
-# status, or the current branch, fetch, etc...
-#
-# Optionally override
-# - GITHUB_ORG
-# - GIT_REPOS_BASE_URL
-#
+ SETUP
+	repos:		alias of clone
+	clean:		optimistically run `make clean` on all repos
+	build:		optimistically run `make build` on all repos
+	filemode:	set config core.filemode false
+
+ENVIRONMENT CONFIG
+	GIT_REPOS		repo names
+
+	- optional overrides -
+	GITHUB_ORG		
+	GIT_REPOS_BASE_URL	if not hosted on github.com
+
+endef
+
 GITHUB_ORG ?= ginkgostreet
 GIT_REPOS_BASE_URL ?= git@github.com:${GITHUB_ORG}/#
+
+%-fmode:
+	@ git -C "${*}" config core.filemode false
+
+filemode: $(foreach repo, ${GIT_REPOS}, ${repo}-fmode)
 
 %-clone:
 	[ -d ${*} ] && true || git clone ${GIT_REPOS_BASE_URL}${*}.git
 
 clone repos: $(foreach repo, ${GIT_REPOS}, ${repo}-clone)
+	$(MAKE) -C filemode
 
 %-fetch:
 	@ echo ' - ' git fetch ${*} ' - '
