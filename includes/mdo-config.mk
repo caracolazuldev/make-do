@@ -1,68 +1,68 @@
-# # #
+define HELP_TEXT
+
 # Utilities for using and managing environment configuration files.
-# This make script is self-contained and can be copied into your project.
-#
-# TO USE:
-# Insert the following at the begining of your Makefile, listing all 
-# of your config files:
-#
-#	CONFIG_INCLUDES = conf/project.conf conf/db.conf
-#	include utils/configure-utils.mk
-#
-# IMPORTANT: each of your config files must have a template file (.tpl).
-# Config files must have a .conf file-extension.
-#
-# To declare defaults for your project, include a .conf file, or include
-# another defaults file loaded before the config. 
-#
-# Example Config File Declaration: 
-#	export PROJECT_ROOT ?= /var/www/# comments are used in user-prompts.
-# Interactive Prompt: 
-#	PROJECT_ROOT ( comments are used in user-prompts. ) = [/var/www/]?
-#
-# TIP: include a trailing-slash when configuring paths. 
-# TIP: terminate paths with a hash/sharp to avoid the error of
-# trailing-white-space.
-# WARNING: escape spaces in paths in your config-include list. 
-#
-# FEATURES:
-# Includes the files in the CONFIG_INCLUDES list.
-#
-# Set AUTO_INCLUDE_CONFS instead of CONFIG_INCLUDES to include files that 
-# have a .tpl file in conf/. 
-# If the files conf/project.tpl, conf/db.tpl exist:
-# CONFIG_INCLUDES will contain conf/project.conf conf/db.conf
-#
-# e.g. AUTO_INCLUDE_CONFS = true 
-# i.e. empty is false 
-#
-# Provides an implicit recipe for %.conf files. This causes missing
-# configuration files to be automatically (and interactively) generated.
-#
-# Generating or updating `.conf` files requires a `.tpl` file. When an included
-# conf file does not exist, the make rule for `%.conf` is used to generate it
-# from the `.tpl` file. If a variable is defined in the environment, the value
-# will be offered as the default.
-#
-# Use the `conf-save` or `non-interactive` targets to update any config files
-# listed in CONFIG_INCLUDES. This will have no effect unless your variable
-# declarations use the conditional assignment operator, `?=` to allow the
-# environment precedence over the file.
-#
-# The target, `reconfigure` will interactively prompt you to enter the config
-# values. Since the config file is always loaded first, you can run configure
-# multiple times, and existing configs will be loaded as default values.
-#
-# Use `add-config` to easily add new configs to your template. Specify the
-# basename of your config file, and your new variable will be appended to the
-# template file.
-#
-# Several other useful utils for working with configs or generating files.
-# Use the source. Several awk scripts distributed in this package are embedded
-# as macros, including the scripts for embedding macros. See `update-embeds.mk`
-# for an example of how to package an awk script as a macro in your makefile.
-#
-# # #
+Automatically includes files with both 
+  - the suffix, '.conf' 
+  - and that have a `.tpl` file in `conf/`
+
+Auto-discovered configs are listed in CONFIG_INCLUDES.
+If the files conf/project.tpl, conf/db.tpl exist:
+CONFIG_INCLUDES will contain conf/project.conf conf/db.conf
+Auto-inclusion can be disabled by setting a value for CONFIG_INCLUDES before 
+this file is executed.
+ 
+## FEATURES:
+
+Write a make recipe to interactively generate a file from any template
+using the make function, $(interactive-config.awk)
+	`$(interactive-config.awk) template filename`
+
+If a variable is defined in the environment, the value will be 
+offered as the default. Since the config file is always loaded first, 
+existing configs will be loaded as default values.
+
+Non-interactively replace {{TOKEN}}'s in a file:
+	`${REPLACE_TOKENS} < file.in > file.out`
+
+Provides an implicit recipe for `%.conf` files. This causes missing
+configuration files to be automatically (and interactively) generated.
+
+## CREATING CONFIG TEMPLATES:
+
+Use `make add-config` to interactively add new configs to your template.
+Specify the basename of your config file, and your new variable will be 
+appended to the template file. 
+(NOTE: specify the path but not the extension to your new config file.)
+
+Example Config File Declaration: 
+	`export PROJECT_ROOT ?= /var/www/# comments are used in user-prompts.`
+
+Interactive Prompt: 
+	`PROJECT_ROOT ( comments are used in user-prompts. ) = [/var/www/]?`
+
+TIP: include a trailing-slash when configuring paths. 
+TIP: terminate paths with a hash/sharp to avoid the error of
+ trailing-white-space.
+WARNING: escape spaces in paths in your config-include list. 
+
+## UPDATING CONFIG FILES: 
+
+Use the `save-conf` or `non-interactive` targets to update any config files
+auto-discoverd or listed in CONFIG_INCLUDES. This will have no effect unless
+your variable declarations use the conditional assignment operator, `?=` to 
+allow the environment precedence over the file.
+
+The target, `reconfigure` will interactively prompt you to enter the config
+values. 
+ 
+## EXTENDING MAKEFILES WITH GNU AWK SCRIPTS:
+
+Several awk scripts distributed in this package are embedded
+as macros, including the scripts for embedding macros. See `update-embeds.mk`
+for an example of how to package an awk script as a macro in your makefile.
+(Semi-deprecated: likely moved to a new include file.)
+
+endef
 
 CACHED_DG := ${.DEFAULT_GOAL}# ensure we don't interfere with the default goal
 
