@@ -1,10 +1,10 @@
+include mdo-require.mk
+
 # # #
 # Gnu Make functions for Wordpress developers
 #
-# Depends on:
-#  - ${WEB_ROOT}
 
-WEB_ROOT ?= htdocs/#
+$(call require-env,WEB_ROOT)
 
 define purge-wp-plugin
 	- cd ${WEB_ROOT} && wp plugin deactivate ${@} 
