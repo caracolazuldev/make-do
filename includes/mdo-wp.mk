@@ -1,15 +1,17 @@
-include mdo-require.mk
-
 # # #
 # Gnu Make functions for Wordpress developers
 #
+# REQUIRES:
+# - WP_PLUGINS_SRC
+# - WEB_ROOT
+# - WP_PLUGINS_DIR
 
-$(call require-env,WEB_ROOT)
+WP_PLUGINS_SRC ?= ./
 
 define purge-wp-plugin
 	- cd ${WEB_ROOT} && wp plugin deactivate ${@} 
 	- cd ${WEB_ROOT} && wp plugin uninstall ${@}
-	- cd ${WEB_ROOT} && ( wp plugin delete ${@}  || rm -r ${WP_PLUGINS}${@} )
+	- cd ${WEB_ROOT} && ( wp plugin delete ${@}  || rm -r ${WP_PLUGINS_DIR}${@} )
 endef
 
 # # #
@@ -32,7 +34,7 @@ endef
 # Expects the default target to create a plugin distro zip
 #
 plugin-%.zip:
-	$(eval repo := '$(shell find . -type d -name ${*})')
+	$(eval repo := '$(shell find ${WP_PLUGINS_SRC} -type d -name ${*})')
 	#
 	# WARNING: guessed plugin location ${repo}
 	# 
@@ -40,13 +42,13 @@ plugin-%.zip:
 
 define deploy-wp-plugin
 	# $(shell find . -name ${@}.zip)
-	$(eval plugin := '$(shell find . -name ${@}.zip)')
+	$(eval plugin := '$(shell find ${WP_PLUGINS_SRC} -name ${@}.zip)')
 	#
 	# WARNING: found plugin distro-zip, ${plugin}
 	#
-	cp ${plugin} ${WP_PLUGINS}
-	cd ${WP_PLUGINS} && wp plugin install --activate ${@}.zip
-	rm ${WP_PLUGINS}${@}.zip
+	cp ${plugin} ${WP_PLUGINS_DIR}
+	cd ${WP_PLUGINS_DIR} && wp plugin install --activate ${@}.zip
+	rm ${WP_PLUGINS_DIR}${@}.zip
 endef
 
 # # #
@@ -62,7 +64,7 @@ define deploy-theme
 	@# activate a distro theme:
 	cd ${WEB_ROOT} && wp theme activate twentynineteen
 	# deploy and activate the theme
-	rsync -r repos/${@} ${WEB_ROOT}wp-content/themes/
+	rsync -r ${WP_PLUGINS_SRC}${@} ${WEB_ROOT}wp-content/themes/
 	cd ${WEB_ROOT} && wp theme activate ${@}
 endef
 
