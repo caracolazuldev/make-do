@@ -68,13 +68,8 @@ CACHED_DG := ${.DEFAULT_GOAL}# ensure we don't interfere with the default goal
 
 AWK := awk --posix
 
-ifdef AUTO_INCLUDE_CONFS
-CONFIG_INCLUDES = $(subst .tpl,.conf,$(shell find conf -name '*.tpl'))
-endif
-
-ifndef CONFIG_INCLUDES
-$(error CONFIG_INCLUDES must be set before including configure-utils.mk)
-endif
+# If not set, search for config files to include:
+CONFIG_INCLUDES ?= $(subst .tpl,.conf,$(shell find conf -name '*.tpl'))
 include ${CONFIG_INCLUDES}
 
 recipe-escape:
