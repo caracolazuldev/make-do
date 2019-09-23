@@ -72,28 +72,8 @@ CACHED_DG := ${.DEFAULT_GOAL}# ensure we don't interfere with the default goal
 AWK := awk --posix
 
 # If not set, search for config files to include:
-CONFIG_INCLUDES ?= $(subst .tpl,.conf,$(shell find conf -name '*.tpl' | sort))
+CONFIG_INCLUDES ?= $(subst .tpl,.conf,$(shell find conf -name '*.tpl' | sort -d ))
 include ${CONFIG_INCLUDES}
-
-recipe-escape:
-	$(eval INFILE ?= ${--in})
-	$(eval OUTFILE ?= ${--out})
-	$(recipe-escape.awk) <${INFILE} >${OUTFILE};
-.PHONY: recipe-escape
-
-recipe-unescape:
-	$(eval INFILE ?= ${--in})
-	$(eval OUTFILE ?= ${--out})
-	${recipe-unescape.awk} <${INFILE} >${OUTFILE};
-.PHONY: recipe-unescape
-
-recipe-minify:
-	$(eval INFILE ?= ${--in})
-	$(eval OUTFILE ?= ${--out})
-	$(info processing ${INFILE})
-	@echo 
-	@$(minify.awk) <${INFILE} | $(recipe-escape.awk) >${OUTFILE}
-.PHONY: recipe-minify
 
 # # #
 # Creates a config file from a tpl.
@@ -123,6 +103,10 @@ reconfigure:
 save-conf non-interactive: $(foreach conf,${CONFIG_INCLUDES},${conf}-save)
 .PHONY: noninteractive
 
+list-configs:
+	cat ${CONFIG_INCLUDES}
+.PHONY: list-configs
+
 # # #
 # Prompts to declare a new variable and append to a template.
 #
@@ -143,6 +127,26 @@ REPLACE_TOKENS = perl -p -e 's%\{\{([^}]+)\}\}%defined $$ENV{$$1} ? $$ENV{$$1} :
 space := 
 space += # hack that exploits implicit space added when concatenating assignment
 escape-spaces = $(subst ${space},\${space},$(strip $1))
+
+recipe-escape:
+	$(eval INFILE ?= ${--in})
+	$(eval OUTFILE ?= ${--out})
+	$(recipe-escape.awk) <${INFILE} >${OUTFILE};
+.PHONY: recipe-escape
+
+recipe-unescape:
+	$(eval INFILE ?= ${--in})
+	$(eval OUTFILE ?= ${--out})
+	${recipe-unescape.awk} <${INFILE} >${OUTFILE};
+.PHONY: recipe-unescape
+
+recipe-minify:
+	$(eval INFILE ?= ${--in})
+	$(eval OUTFILE ?= ${--out})
+	$(info processing ${INFILE})
+	@echo 
+	@$(minify.awk) <${INFILE} | $(recipe-escape.awk) >${OUTFILE}
+.PHONY: recipe-minify
 
 # # #
 # generate a list of variable names by parsing strings on stdin
