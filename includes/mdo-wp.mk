@@ -3,17 +3,14 @@
 #
 # Depends on:
 #  - ${WEB_ROOT}
-#  - ${REPOS}
 
 WEB_ROOT ?= htdocs/#
-REPOS ?= repos/#
 
 define purge-wp-plugin
 	- cd ${WEB_ROOT} && wp plugin deactivate ${@} 
 	- cd ${WEB_ROOT} && wp plugin uninstall ${@}
 	- cd ${WEB_ROOT} && ( wp plugin delete ${@}  || rm -r ${WP_PLUGINS}${@} )
 endef
-
 
 # # #
 # Meant for use in a plugin build-make, probably not a deployment-util.
@@ -35,15 +32,15 @@ endef
 # Expects the default target to create a plugin distro zip
 #
 plugin-%.zip:
-	$(eval repo := '$(shell find ${REPOS} -type d -name ${*})')
+	$(eval repo := '$(shell find . -type d -name ${*})')
 	#
 	# WARNING: guessed plugin location ${repo}
 	# 
-	cd ${repo} && $(MAKE)
+	$(MAKE) -C ${repo}
 
 define deploy-wp-plugin
-	# $(shell find ${REPOS} -name ${@}.zip)
-	$(eval plugin := '$(shell find ${REPOS}  -name ${@}.zip)')
+	# $(shell find . -name ${@}.zip)
+	$(eval plugin := '$(shell find . -name ${@}.zip)')
 	#
 	# WARNING: found plugin distro-zip, ${plugin}
 	#
@@ -104,4 +101,3 @@ wp-debug-log: enable-wp-debug
 # END Targets
 # Rset .DEFAULT_GOAL
 .DEFAULT_GOAL := ${CACHED_DG}
-
