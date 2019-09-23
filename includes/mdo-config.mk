@@ -69,7 +69,7 @@ CACHED_DG := ${.DEFAULT_GOAL}# ensure we don't interfere with the default goal
 AWK := awk --posix
 
 # If not set, search for config files to include:
-CONFIG_INCLUDES ?= $(subst .tpl,.conf,$(shell find conf -name '*.tpl'))
+CONFIG_INCLUDES ?= $(subst .tpl,.conf,$(shell find conf -name '*.tpl' | sort))
 include ${CONFIG_INCLUDES}
 
 recipe-escape:
