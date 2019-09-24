@@ -19,7 +19,7 @@ endif
 # Don't run wp as root:
 WP_CLI = sudo -u ${WEB_USER} ${wp-cli-bin} --path=${WEB_ROOT}
 
-define purge-wp-plugin
+define wp-purge-plugin
 	- cd ${WEB_ROOT} && ${WP_CLI} plugin deactivate ${@} 
 	- cd ${WEB_ROOT} && ${WP_CLI} plugin uninstall ${@}
 	- cd ${WEB_ROOT} && ( ${WP_CLI} plugin delete ${@}  || rm -r ${WP_PLUGINS_DIR}${@} )
@@ -51,7 +51,7 @@ plugin-%.zip:
 	# 
 	$(MAKE) -C ${repo}
 
-define deploy-wp-plugin
+define wp-deploy-plugin
 	# $(shell find . -name ${@}.zip)
 	$(eval plugin := '$(shell find ${WP_PLUGINS_SRC}${@} -name ${@}.zip)')
 	#
@@ -65,18 +65,16 @@ endef
 # # #
 # for publicly listed plugins
 #
-define install-public-wp-plugin
-	cd ${WEB_ROOT} && wp plugin install --activate ${@}
-endef
+WP_INSTALL_PLUGIN := $(WP_CLI) plugin install --activate 
 
-define deploy-theme
+define wp-deploy-theme
 	@# for development: start by deleting the theme, in-case there are errors in the last deployment.
 	[ -d ${WEB_ROOT}wp-content/themes/${@} ] && cd ${WEB_ROOT} && rm -rf ${WEB_ROOT}wp-content/themes/${@} || true
 	@# activate a distro theme:
-	cd ${WEB_ROOT} && wp theme activate twentynineteen
+	$(WP_CLI) theme activate twentynineteen
 	# deploy and activate the theme
 	rsync -r ${WP_PLUGINS_SRC}${@} ${WEB_ROOT}wp-content/themes/
-	cd ${WEB_ROOT} && wp theme activate ${@}
+	$(WP_CLI) theme activate ${@}
 endef
 
 define DEBUG_PATCH
