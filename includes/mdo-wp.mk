@@ -97,6 +97,27 @@ define WP_DEBUG_PATCH
 endef
 export WP_DEBUG_PATCH
 
+# to create a default .htaccess file:
+# echo "$$WP_BASE_HTACCESS" > ${WEB_ROOT}.htaccess
+define WP_BASE_HTACCESS
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+
+# END WordPress
+endef
+export WP_BASE_HTACCESS
+
+define wp-permalink-postname
+	$(WP_CLI) option update permalink_structure '/%postname%'
+endef
+
 # # # 
 # Targets
 # # #
@@ -124,6 +145,7 @@ wp-install: ${WEB_ROOT} | require-env-DB_CMS_DB require-env-DB_USER require-env-
 	${WP_CLI} db create
 	# ${WP_CLI} core install
 	@${WP_CLI} core install --url="${CMS_URL}" --title="${CMS_TITLE}" --admin_user="${CMS_ADMIN_USER}" --admin_password="${CMS_ADMIN_PASSWORD}" --admin_email="${CMS_ADMIN_EMAIL}"
+	echo "$$WP_BASE_HTACCESS" > ${WEB_ROOT}.htaccess
 	
 wp-destroy: | require-env-WEB_ROOT require-env-DB_CMS_DB
 	- $(WP_CLI) db query 'DROP DATABASE IF EXISTS ${DB_CMS_DB}'
