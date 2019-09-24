@@ -17,28 +17,32 @@ $(error wp-cli NOT FOUND)
 endif
 
 # Don't run wp as root:
-WP_CLI = sudo -u ${WEB_USER} ${wp-cli-bin} --path=${WEB_ROOT}
+WP_CLI = sudo -u ${WEB_USER} ${wp-cli-bin} --path=${WEB_ROOT} --skip-plugins --skip-themes
 
 define wp-purge-plugin
-	- cd ${WEB_ROOT} && ${WP_CLI} plugin deactivate ${@} 
-	- cd ${WEB_ROOT} && ${WP_CLI} plugin uninstall ${@}
-	- cd ${WEB_ROOT} && ( ${WP_CLI} plugin delete ${@}  || rm -r ${WP_PLUGINS_DIR}${@} )
+	- ${WP_CLI} plugin uninstall --deactivate ${1}
+	- ( ${WP_CLI} plugin delete ${1}  || rm -r ${WP_PLUGINS_DIR}${1} )
+endef
+
+define wp-purge-theme
+	[ -d ${WEB_ROOT}wp-content/themes/${1} ] && cd ${WEB_ROOT} && rm -rf ${WEB_ROOT}wp-content/themes/${1} || true
 endef
 
 # # #
 # Meant for use in a plugin build-make, probably not a deployment-util.
+# Line-continuations used to avoid suprises when used in a recipe.
 #
 define wp-plugin-archive
-	[ -d  dist ] && rm -rf dist || true
-	mkdir -p dist/${@}
+	([ -d  dist ] && rm -rf dist || true); \
+	mkdir -p dist/${1}; \
 	rsync -a --delete --copy-links \
 	--exclude .git --exclude .gitignore \
 	--exclude phpunit --exclude tests \
 	--exclude '*.env' --exclude '*.conf' \
 	--exclude dist \
-	. dist/${@}/
-	cd dist &&  zip -qr ${@}.zip ${@}/
-	rm -rf dist/${@}/
+	. dist/${1}/; \
+	cd dist &&  zip -qr ${1}.zip ${1}/; \
+	rm -rf dist/${1}/;
 endef
 
 # # #
@@ -52,14 +56,12 @@ plugin-%.zip:
 	$(MAKE) -C ${repo}
 
 define wp-deploy-plugin
-	# $(shell find . -name ${@}.zip)
-	$(eval plugin := '$(shell find ${WP_PLUGINS_SRC}${@} -name ${@}.zip)')
+	$(eval plugin := '$(shell find ${WP_PLUGINS_SRC} -name ${1}.zip)')
 	#
-	# WARNING: found plugin distro-zip, ${plugin}
+	# NOTICE: found plugin-distro-zip: ${plugin}
 	#
-	cp ${plugin} ${WP_PLUGINS_DIR}
-	cd ${WP_PLUGINS_DIR} && wp plugin install --activate ${@}.zip
-	rm ${WP_PLUGINS_DIR}${@}.zip
+	- $(WP_CLI) plugin delete ${1} || rm -r ${WP_PLUGINS_DIR}${1}
+	$(WP_CLI) plugin install --activate ${plugin}
 endef
 
 # # #
@@ -68,16 +70,16 @@ endef
 WP_INSTALL_PLUGIN := $(WP_CLI) plugin install --activate 
 
 define wp-deploy-theme
-	@# for development: start by deleting the theme, in-case there are errors in the last deployment.
-	[ -d ${WEB_ROOT}wp-content/themes/${@} ] && cd ${WEB_ROOT} && rm -rf ${WEB_ROOT}wp-content/themes/${@} || true
+	$(eval theme := '$(shell find ${WP_PLUGINS_SRC} -name ${1}.zip)')
+	$(call wp-purge-theme,${1})
 	@# activate a distro theme:
-	$(WP_CLI) theme activate twentynineteen
+	@#$(WP_CLI) theme activate twentynineteen
 	# deploy and activate the theme
-	rsync -r ${WP_PLUGINS_SRC}${@} ${WEB_ROOT}wp-content/themes/
-	$(WP_CLI) theme activate ${@}
+	#rsync -r ${WP_PLUGINS_SRC}${1} ${WEB_ROOT}wp-content/themes/
+	$(WP_CLI) --skip-themes theme install --activate --force ${theme}
 endef
 
-define DEBUG_PATCH
+define WP_DEBUG_PATCH
 --- wp-config.php	2019-05-29 19:05:26.689652862 -0400
 +++ wp-config.php	2019-05-29 19:05:29.241667777 -0400
 @@ -18,6 +18,10 @@
@@ -93,7 +95,7 @@ define DEBUG_PATCH
  define( 'DB_NAME', 'msa_cms_dev' );
 
 endef
-export DEBUG_PATCH
+export WP_DEBUG_PATCH
 
 # # # 
 # Targets
@@ -102,7 +104,7 @@ export DEBUG_PATCH
 CACHED_DG := ${.DEFAULT_GOAL}
 
 wp-enable-debug: | require-env-WEB_ROOT
-	- cd ${WEB_ROOT} && echo "$$DEBUG_PATCH" | patch -f -F 0
+	- cd ${WEB_ROOT} && echo "$$WP_DEBUG_PATCH" | patch -f -F 0
 	touch ${WEB_ROOT}wp-content/debug.log
 
 wp-debug-log: enable-wp-debug | require-env-WEB_ROOT
