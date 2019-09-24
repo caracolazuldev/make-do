@@ -28,6 +28,11 @@ endef
 GITHUB_ORG ?= ginkgostreet
 GIT_REPOS_BASE_URL ?= git@github.com:${GITHUB_ORG}/#
 
+build-%:
+	- $(MAKE) -C ${*}
+
+build: $(foreach repo, ${GIT_REPOS}, build-${repo})
+
 %-fmode:
 	@ git -C "${*}" config core.filemode false
 
@@ -50,7 +55,7 @@ fetch: $(foreach repo, ${GIT_REPOS}, ${repo}-fetch)
 	@ echo ' - ' git status ${*} ' - '
 	@ git -C "${*}" status --short --branch
 
-status: $(foreach repo, ${GIT_REPOS}, ${repo}-status)
+status list: $(foreach repo, ${GIT_REPOS}, ${repo}-status)
 
 %-branch:
 	@ $(eval BRANCH_NAME := $(shell git -C "${*}" branch | grep '^*' | tr -d '*'))
@@ -75,8 +80,3 @@ clean-%:
 	- $(MAKE) -C ${*} clean
 
 clean: $(foreach repo, ${GIT_REPOS}, clean-${repo})
-
-build-%:
-	- $(MAKE) -C ${*}
-
-build: $(foreach repo, ${GIT_REPOS}, build-${repo})
