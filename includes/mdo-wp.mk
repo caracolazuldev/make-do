@@ -6,12 +6,22 @@
 # - WEB_ROOT
 # - WP_PLUGINS_DIR
 
+WEB_USER ?= www-data
+
+wp-cli-bin := $(shell command -v wp 2>/dev/null)
+ifndef wp-cli-bin
+$(error wp-cli NOT FOUND)
+endif
+
+# Don't run wp as root:
+WP_CLI = sudo -u ${WEB_USER} ${wp-cli-bin} --path=${WEB_ROOT}
+
 WP_PLUGINS_SRC ?= ./
 
 define purge-wp-plugin
-	- cd ${WEB_ROOT} && wp plugin deactivate ${@} 
-	- cd ${WEB_ROOT} && wp plugin uninstall ${@}
-	- cd ${WEB_ROOT} && ( wp plugin delete ${@}  || rm -r ${WP_PLUGINS_DIR}${@} )
+	- cd ${WEB_ROOT} && ${WP_CLI} plugin deactivate ${@} 
+	- cd ${WEB_ROOT} && ${WP_CLI} plugin uninstall ${@}
+	- cd ${WEB_ROOT} && ( ${WP_CLI} plugin delete ${@}  || rm -r ${WP_PLUGINS_DIR}${@} )
 endef
 
 # # #
@@ -92,12 +102,31 @@ export DEBUG_PATCH
 
 CACHED_DG := ${.DEFAULT_GOAL}
 
-enable-wp-debug:
+wp-enable-debug:
 	- cd ${WEB_ROOT} && echo "$$DEBUG_PATCH" | patch -f -F 0
 	touch ${WEB_ROOT}wp-content/debug.log
 
 wp-debug-log: enable-wp-debug
 	cd ${WEB_ROOT} && tail -fn100 wp-content/debug.log
+
+wp-file-acl:
+	@# first clear facls set:
+	sudo setfacl -Rx 'g:www-data,d:g:www-data' ${PROJ_ROOT}htdocs/wp-content
+	sudo setfacl -Rm 'm:rwx,d:u::rwx,d:g:www-data:rwX,u::rwX,g:www-data:rwX' ${PROJ_ROOT}htdocs/wp-content
+
+# run wp as current user (bypass WP_CLI)
+wp-install: WP_CLI = ${wp-cli-bin} --path=${WEB_ROOT}
+wp-install: ${WEB_ROOT}
+	${WP_CLI} core download
+	# ${WP_CLI} core config
+	@${WP_CLI} core config --dbname=${DB_CMS_DB} --dbuser=${DB_USER} --dbpass=${DB_PASSWORD}
+	${WP_CLI} db create
+	# ${WP_CLI} core install
+	@${WP_CLI} core install --url="${CMS_URL}" --title="${CMS_TITLE}" --admin_user="${CMS_ADMIN_USER}" --admin_password="${CMS_ADMIN_PASSWORD}" --admin_email="${CMS_ADMIN_EMAIL}"
+	
+wp-destroy:
+	- $(WP_CLI) db query 'DROP DATABASE IF EXISTS ${DB_CMS_DB}'
+	- rm -rf ${WEB_ROOT}
 
 # # #
 # END Targets
