@@ -42,7 +42,7 @@ filemode: $(foreach repo, ${GIT_REPOS}, ${repo}-fmode)
 	[ -d ${*} ] && true || git clone ${GIT_REPOS_BASE_URL}${*}.git
 
 clone repos: $(foreach repo, ${GIT_REPOS}, ${repo}-clone)
-	$(MAKE) -C filemode
+	$(MAKE) filemode
 
 %-fetch:
 	@ echo ' - ' git fetch ${*} ' - '
