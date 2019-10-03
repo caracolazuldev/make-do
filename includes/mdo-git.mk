@@ -25,8 +25,12 @@ ENVIRONMENT CONFIG
 
 endef
 
+include mdo-help.mk
+
 GITHUB_ORG ?= ginkgostreet
 GIT_REPOS_BASE_URL ?= git@github.com:${GITHUB_ORG}/#
+
+$(call require-env, GIT_REPOS)
 
 build-%:
 	- $(MAKE) -C ${*}
