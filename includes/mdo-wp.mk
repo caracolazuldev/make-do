@@ -21,11 +21,11 @@ WP_CLI = sudo -u ${WEB_USER} ${wp-cli-bin} --path=${WEB_ROOT} --skip-plugins --s
 
 define wp-purge-plugin
 	- ${WP_CLI} plugin uninstall --deactivate ${1}
-	- ( ${WP_CLI} plugin delete ${1}  || rm -r ${WP_PLUGINS_DIR}${1} )
+	- ( ${WP_CLI} plugin delete ${1}  || rm -r ${WP_PLUGINS_DIR}$(strip ${1}) )
 endef
 
 define wp-purge-theme
-	[ -d ${WEB_ROOT}wp-content/themes/${1} ] && cd ${WEB_ROOT} && rm -rf ${WEB_ROOT}wp-content/themes/${1} || true
+	[ -d ${WEB_ROOT}wp-content/themes/$(strip ${1}) ] && cd ${WEB_ROOT} && rm -rf ${WEB_ROOT}wp-content/themes/$(strip ${1}) || true
 endef
 
 # # #
@@ -34,15 +34,15 @@ endef
 #
 define wp-plugin-archive
 	([ -d  dist ] && rm -rf dist || true); \
-	mkdir -p dist/${1}; \
+	mkdir -p dist/$(strip ${1}); \
 	rsync -a --delete --copy-links \
 	--exclude .git --exclude .gitignore \
 	--exclude phpunit --exclude tests \
 	--exclude '*.env' --exclude '*.conf' \
 	--exclude dist \
-	. dist/${1}/; \
-	cd dist &&  zip -qr ${1}.zip ${1}/; \
-	rm -rf dist/${1}/;
+	. dist/$(strip ${1})/; \
+	cd dist &&  zip -qr $(strip ${1}).zip $(strip ${1})/; \
+	rm -rf dist/$(strip ${1})/;
 endef
 
 # # #
@@ -56,11 +56,11 @@ plugin-%.zip:
 	$(MAKE) -C ${repo}
 
 define wp-deploy-plugin
-	$(eval plugin := '$(shell find ${WP_PLUGINS_SRC} -name ${1}.zip)')
+	$(eval plugin := '$(shell find ${WP_PLUGINS_SRC} -name $(strip ${1}).zip)')
 	#
 	# NOTICE: found plugin-distro-zip: ${plugin}
 	#
-	- $(WP_CLI) plugin delete ${1} || rm -r ${WP_PLUGINS_DIR}${1}
+	- $(WP_CLI) plugin delete ${1} || rm -r $(strip ${WP_PLUGINS_DIR})$(strip ${1})
 	$(WP_CLI) plugin install --activate ${plugin}
 endef
 
@@ -70,8 +70,8 @@ endef
 WP_INSTALL_PLUGIN := $(WP_CLI) plugin install --activate 
 
 define wp-deploy-theme
-	$(eval theme := '$(shell find ${WP_PLUGINS_SRC} -name ${1}.zip)')
-	$(call wp-purge-theme,${1})
+	$(eval theme := '$(shell find ${WP_PLUGINS_SRC} -name $(strip ${1}).zip)')
+	$(call wp-purge-theme,$(strip ${1}))
 	@# activate a distro theme:
 	@#$(WP_CLI) theme activate twentynineteen
 	# deploy and activate the theme
