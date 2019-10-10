@@ -15,5 +15,5 @@ require-env-%:
 # e.g. $(call require-env, PROJ_ROOT)
 #
 define require-env
-$(if ${$(strip $1}),,$(error required env ${1} is not defined))
+$(if ${$(strip ${1})},,$(error required env ${1} is not defined))
 endef
