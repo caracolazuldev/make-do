@@ -25,7 +25,7 @@ define wp-purge-plugin
 endef
 
 define wp-purge-theme
-	[ -d ${WEB_ROOT}wp-content/themes/$(strip ${1}) ] && cd ${WEB_ROOT} && rm -rf ${WEB_ROOT}wp-content/themes/$(strip ${1}) || true
+	[ -d ${WEB_ROOT}wp-content/themes/$(strip ${1}) ] || [ -L ${WEB_ROOT}wp-content/themes/$(strip ${1}) ] && rm -rf ${WEB_ROOT}wp-content/themes/$(strip ${1}) || true
 endef
 
 # # #
@@ -71,7 +71,7 @@ WP_INSTALL_PLUGIN := $(WP_CLI) plugin install --activate
 
 define wp-deploy-theme
 	$(eval theme := '$(shell find ${WP_PLUGINS_SRC} -name $(strip ${1}).zip)')
-	$(call wp-purge-theme,$(strip ${1}))
+	$(call wp-purge-theme,${1})
 	@# activate a distro theme:
 	@#$(WP_CLI) theme activate twentynineteen
 	# deploy and activate the theme
