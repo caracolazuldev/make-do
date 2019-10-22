@@ -90,19 +90,18 @@ define wp-deploy-theme
 endef
 
 define WP_DEBUG_PATCH
---- wp-config.php	2019-05-29 19:05:26.689652862 -0400
-+++ wp-config.php	2019-05-29 19:05:29.241667777 -0400
-@@ -18,6 +18,10 @@
+--- wp-config.php
++++ wp-config.php
+@@ -18,5 +18,9 @@
   * @package WordPress
   */
- 
++
 +define( 'WP_DEBUG', true );
 +define( 'WP_DEBUG_DISPLAY', false );
 +define( 'WP_DEBUG_LOG', true );
-+
+
  // ** MySQL settings ** //
  /** The name of the database for WordPress */
- define( 'DB_NAME', 'msa_cms_dev' );
 
 endef
 export WP_DEBUG_PATCH
