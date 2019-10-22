@@ -6,6 +6,16 @@ include mdo-require.mk
 # - WEB_ROOT
 # - WP_PLUGINS_SRC [./]
 # - WP_PLUGINS_DIR [${WEB_ROOT}wp-content/plugins/] 
+#
+# WP INSTALL REQUIRES:
+# - DB_CMS_DB
+# - DB_USER
+# - DB_PASSWORD
+# - CMS_URL
+# - CMS_ADMIN_USER
+# - CMS_ADMIN_PASSWORD
+# - CMS_ADMIN_EMAIL
+#
 
 WEB_USER ?= www-data
 WP_PLUGINS_SRC ?= ./
