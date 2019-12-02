@@ -137,8 +137,8 @@ wp-enable-debug: | require-env-WEB_ROOT
 	- cd ${WEB_ROOT} && echo "$$WP_DEBUG_PATCH" | patch -f -F 0
 	touch ${WEB_ROOT}wp-content/debug.log
 
-wp-debug-log: enable-wp-debug | require-env-WEB_ROOT
-	cd ${WEB_ROOT} && tail -fn100 wp-content/debug.log
+wp-debug-log: ${WEB_ROOT}wp-content/debug.log | require-env-WEB_ROOT
+	tail -fn100 $<
 
 wp-file-acl: | require-env-WEB_ROOT
 	@# first clear facls set:
