@@ -17,7 +17,7 @@ README ?= README
 HELP_FILE = $(or $(wildcard ${README}.md),$(wildcard ${README}))
 HELP_FILE := $(or ${HELP_FILE},NOFILE)# because empty will cause erroneous checks later.
 
-pandoc != command -v pandoc 2>/dev/null
+pandoc := $(shell command -v pandoc 2>/dev/null)
 
 # Un-set pandoc if README is not a markdown file.
 ifneq (.md,$(findstring .md,${HELP_FILE}))
