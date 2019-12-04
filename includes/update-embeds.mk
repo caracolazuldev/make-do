@@ -6,7 +6,7 @@
 # embed-awk can be used to embed an awk script into ay Makefile
 # See embed-src for a sample invocation
 
-AWK = awk --posix
+AWK = awk
 
 embed-src:
 	$(eval sources = $(shell find src/ -name '*.awk' ))
