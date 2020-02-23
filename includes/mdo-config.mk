@@ -72,7 +72,7 @@ CACHED_DG := ${.DEFAULT_GOAL}# ensure we don't interfere with the default goal
 AWK := awk
 
 # If not set, search for config files to include:
-CONFIG_INCLUDES ?= $(subst .tpl,.conf,$(shell find conf -name '*.tpl' | sort -d ))
+CONFIG_INCLUDES ?= $(subst .tpl,.conf,$(shell find conf -name '*.tpl' 2>/dev/null | sort -d ))
 include ${CONFIG_INCLUDES}
 
 # # #
