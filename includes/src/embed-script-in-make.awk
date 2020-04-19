@@ -27,6 +27,7 @@ BEGIN {
     
     DEFINE_NAME = ENVIRON["DEFINE_NAME"];
     if (! DEFINE_NAME ) { DEFINE_NAME = ENVIRON["SOURCE_FILE"]; }
+    DEFINE_NAME = rtrim(DEFINE_NAME);
 
     # we expect recipe-escape.awk to include a trailing-backslash:
     DEFINE_BODY = rtrim(DEFINE_BODY);
@@ -35,7 +36,7 @@ BEGIN {
     
     DEFINE_BODY = "$(AWK) '" DEFINE_BODY "'";
    
-    start_define = "define[[:blank:]]+" DEFINE_NAME;
+    start_define = "define[[:blank:]]+" DEFINE_NAME "[[:blank:]]?$";
     definition = "define " DEFINE_NAME "\n" DEFINE_BODY "\nendef";
 }
 
