@@ -3,8 +3,8 @@
 # embed-src updates or adds any awk scripts in the src/ directory:
 # embedding them in configure-utils.mk.
 # 
-# embed-awk can be used to embed an awk script into ay Makefile
-# See embed-src for a sample invocation
+# embed-awk can be used to embed an awk script into any Makefile
+# The target below, embed-src, is a sample invocation.
 
 AWK = awk
 
@@ -18,7 +18,7 @@ embed-awk: EMBED_FILE = ${--embed-file}
 embed-awk: OUTFILE = ${--target}
 embed-awk: TMP_TARGET := $(shell echo /tmp/f-$$(od -An -N4 -tx /dev/urandom| tr -d ' '))
 embed-awk: TMP_SOURCE := $(shell echo /tmp/f-$$(od -An -N4 -tx /dev/urandom| tr -d ' '))
-embed-awk: export DEFINE_NAME = $(shell basename ${EMBED_FILE})
+embed-awk: export DEFINE_NAME = $(shell basename ${EMBED_FILE}) # environment param to awk script
 embed-awk:
 	$(info Embedding ${EMBED_FILE})
 	cat ${EMBED_FILE} | $(AWK) -f src/minify.awk | $(AWK) -f src/recipe-escape.awk > ${TMP_SOURCE}
