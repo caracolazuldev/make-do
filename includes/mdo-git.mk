@@ -90,12 +90,13 @@ endef
 # %s subject (message)
 # #an author name
 git-worklog-fmt := %ad %<|(35)%h %<|(120)%s <- %an
-git-worklog-date-fmt := $(shell date --date '-7 days' '+%Y-%m-%d')
+git-worklog-date-since := $(shell date --date '-7 days' '+%Y-%m-%d')
 
 %-git-timelog:
 	$(eval export GIT_REPO := $*)
 	@ git -C $* \
-	log --date=iso --since "${git-worklog-date-fmt}" --pretty=format:'${git-worklog-fmt}' \
+	log --date=iso --since "${git-worklog-date-since}" \
+	--pretty=format:'${git-worklog-fmt}' \
 	| ${worklog.awk}
 
 worklog: 
