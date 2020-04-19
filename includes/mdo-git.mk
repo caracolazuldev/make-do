@@ -88,7 +88,7 @@ endef
 # %h short-hash
 # %<|(N) right-pad next field
 # %s subject (message)
-# #an author name
+# %an author name
 git-worklog-fmt := %ad %<|(35)%h %<|(120)%s <- %an
 git-worklog-date-since := $(shell date --date '-7 days' '+%Y-%m-%d')
 
