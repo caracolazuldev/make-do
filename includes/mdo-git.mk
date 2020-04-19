@@ -30,6 +30,8 @@ include mdo-help.mk
 GITHUB_ORG ?= ginkgostreet
 GIT_REPOS_BASE_URL ?= git@github.com:${GITHUB_ORG}/#
 
+AWK := awk
+
 $(call require-env, GIT_REPOS)
 
 build-%:
@@ -74,6 +76,30 @@ branch: $(foreach repo, ${GIT_REPOS}, ${repo}-branch)
 	@ git -C "${*}" log -n 4 --oneline
 
 logs: $(foreach repo,${GIT_REPOS}, ${repo}-logs)
+
+##
+# needed to insert repo name on each line
+define worklog.awk 
+$(AWK) 'BEGIN {REPO = ENVIRON["GIT_REPO"]}{print $$0 " in " REPO} '
+endef
+
+# %ad author date
+# %<|(N) right-pad next field
+# %h short-hash
+# %<|(N) right-pad next field
+# %s subject (message)
+# #an author name
+git-worklog-fmt := %ad %<|(35)%h %<|(120)%s <- %an
+git-worklog-date-fmt := $(shell date --date '-7 days' '+%Y-%m-%d')
+
+%-git-timelog:
+	$(eval export GIT_REPO := $*)
+	@ git -C $* \
+	log --date=iso --since "${git-worklog-date-fmt}" --pretty=format:'${git-worklog-fmt}' \
+	| ${worklog.awk}
+
+worklog: 
+	@ $(MAKE) -s $(foreach repo,${GIT_REPOS}, ${repo}-git-timelog) | sort
 
 %-pull:
 	echo "${*}"; git -C "${*}" pull
