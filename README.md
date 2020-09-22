@@ -1,5 +1,8 @@
 # make-do
 
+WARNING: this README is out of date. I was getting overly creative with what to do with this library.
+Current recommendation is just use the include files individually in your Makefiles, especially mdo-config.mk and mdo-require.mk. I also recommend mdo-git.mk for projects that use multiple git repos, but it may not be flexible enough for how you lay out your project files. Feedback and patches welcome.
+
 A framework for Make build systems, adds utilities for configuration management and user input. Keep build tasks organized as modules and invoke them as targets.
 
 ## Shell commands
