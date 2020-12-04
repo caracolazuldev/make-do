@@ -38,6 +38,11 @@ define wp-purge-theme
 	[ -d ${WEB_ROOT}wp-content/themes/$(strip ${1}) ] || [ -L ${WEB_ROOT}wp-content/themes/$(strip ${1}) ] && rm -rf ${WEB_ROOT}wp-content/themes/$(strip ${1}) || true
 endef
 
+# suggested by Automattic
+WP_PLUGIN_ARCHIVE_EXCLUDE := .DS_Store .stylelintrc.json .eslintrc .git .gitattributes .github README.md composer.json composer.lock node_modules vendor package-lock.json package.json .travis.yml phpcs.xml.dist sass style.css.map
+# our excludes
+WP_PLUGIN_ARCHIVE_EXCLUDE := ${WP_PLUGIN_ARCHIVE_EXCLUDE} tests '*.conf' '*.env' phpunit gitignore
+
 # # #
 # Meant for use in a plugin build-make, probably not a deployment-util.
 # Line-continuations used to avoid suprises when used in a recipe.
@@ -46,9 +51,7 @@ define wp-plugin-archive
 	([ -d  dist ] && rm -rf dist || true); \
 	mkdir -p dist/$(strip ${1}); \
 	rsync -a --delete --copy-links \
-	--exclude .git --exclude .gitignore \
-	--exclude phpunit --exclude tests \
-	--exclude '*.env' --exclude '*.conf' \
+	$(foreach pat,${WP_PLUGIN_ARCHIVE_EXCLUDE}, --exclude ${pat}) \
 	--exclude dist \
 	. dist/$(strip ${1})/; \
 	cd dist &&  zip -qr $(strip ${1}).zip $(strip ${1})/; \
