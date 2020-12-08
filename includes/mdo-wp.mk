@@ -39,7 +39,7 @@ define wp-purge-theme
 endef
 
 # suggested by Automattic
-WP_PLUGIN_ARCHIVE_EXCLUDE := .DS_Store .stylelintrc.json .eslintrc .git .gitattributes .github README.md composer.json composer.lock node_modules vendor package-lock.json package.json .travis.yml phpcs.xml.dist sass style.css.map
+WP_PLUGIN_ARCHIVE_EXCLUDE := .DS_Store .stylelintrc.json .eslintrc .git .gitattributes .github README.md .travis.yml phpcs.xml.dist sass style.css.map
 # our excludes
 WP_PLUGIN_ARCHIVE_EXCLUDE := ${WP_PLUGIN_ARCHIVE_EXCLUDE} tests '*.conf' '*.env' phpunit gitignore
 
