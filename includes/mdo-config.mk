@@ -101,7 +101,7 @@ reconfigure:
 .PHONY: reconfigure
 
 save-conf non-interactive: $(foreach conf,${CONFIG_INCLUDES},${conf}-save)
-.PHONY: noninteractive
+.PHONY: non-interactive
 
 list-configs:
 	cat ${CONFIG_INCLUDES}
