@@ -73,8 +73,11 @@ AWK := awk
 
 # If not set, search for config files to include:
 CONFIG_INCLUDES ?= $(subst .tpl,.conf,$(shell find conf -name '*.tpl' 2>/dev/null | sort -d ))
+# don't include configs when non-interactive config save is made
+# or else interactive-config will be made first
+ifeq ($(filter save-conf non-interactive %.conf-save,${MAKECMDGOALS}), )
 include ${CONFIG_INCLUDES}
-
+endif
 # # #
 # Creates a config file from a tpl.
 #
