@@ -88,13 +88,13 @@ endif
 	$(info )
 	$(info Generating configuration of ${@}.)
 	@$(eval THEVARS := $(shell $(parse-conf-vars.awk) < ${*}.tpl))
-	@$(foreach var,${THEVARS},$(eval export ${var})) \
-	$(interactive-config.awk) ${*}.tpl ${@}
+	@$(eval export ${THEVARS})
+	@$(interactive-config.awk) ${*}.tpl ${@}
 
 %.conf-save:
 	@$(eval THEVARS := $(shell $(parse-conf-vars.awk) < ${*}.tpl))
-	@$(foreach var,${THEVARS},$(eval export ${var})) \
-	$(REPLACE_TOKENS) <${*}.tpl >${*}.conf
+	@$(eval export ${THEVARS})
+	@$(REPLACE_TOKENS) <${*}.tpl >${*}.conf
 
 # # #
 # -Rr, doesn't load special vars or targets; 
