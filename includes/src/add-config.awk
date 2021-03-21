@@ -16,12 +16,12 @@ BEGIN {
 		if ( name == "" ) { exit; }
 
 		prompt("Help text? "); getline help <STDIN;
-		prompt("export? [yes] "); getline noex <STDIN;
+		prompt("export? [no] "); getline expt <STDIN;
 
-		prefix = (noex) ? "" : "export ";
+		prefix = (expt) ? "export " : "";
 
-		print prefix name " ?= {{" name "}}# " help >> filename;
-		prompt(prefix name " ?= {{" name "}}# " help " >>" filename);
+		print prefix name " = {{" name "}}# " help >> filename;
+		prompt(prefix name " = {{" name "}}# " help " >>" filename);
 	}
 	exit;
 }
