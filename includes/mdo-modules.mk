@@ -13,9 +13,6 @@
 # TODO: reconcile configuration features with mdo-config.mk library.
 #
 
-# use checkbashisms to validate your scripts for use with sh.
-export SHELL := sh
-
 ###
 # Variables
 ###
