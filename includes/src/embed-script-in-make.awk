@@ -32,8 +32,8 @@ BEGIN {
     # we expect recipe-escape.awk to include a trailing-backslash:
     DEFINE_BODY = rtrim(DEFINE_BODY);
     gsub(/\\$/, "", DEFINE_BODY);
+
     # wrap the source with an awk invocation.
-    
     DEFINE_BODY = "$(AWK) '" DEFINE_BODY "'";
    
     start_define = "define[[:blank:]]+" DEFINE_NAME "[[:blank:]]?$";
