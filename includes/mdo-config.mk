@@ -35,7 +35,8 @@ configuration files to be automatically (and interactively) generated.
 Use `make add-config` to interactively add new configs to your template.
 Specify the basename of your config file, and your new variable will be 
 appended to the template file. 
-(NOTE: specify the path but not the extension to your new config file.)
+
+(TIP: You can leave the file extension off of your config file and it will default to .conf. )
 
 Example Config File Declaration: 
 	`export PROJECT_ROOT ?= /var/www/# comments are used in user-prompts.`
@@ -181,3 +182,7 @@ $(AWK) 'BEGIN {STDIN = "-";filename = "";prompt("\nFile-name? "); getline filena
 endef
 
 .DEFAULT_GOAL := ${CACHED_DG}
+
+define worklog.awk
+$(AWK) 'BEGIN {REPO = ENVIRON["GIT_REPO"]}{print $$0 " in " REPO} '
+endef
