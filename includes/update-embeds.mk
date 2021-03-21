@@ -1,7 +1,7 @@
 # # #
-# Updates the embedded scripts in configure-utils.mk
+# Updates the embedded scripts in mdo-config.mk
 # embed-src updates or adds any awk scripts in the src/ directory:
-# embedding them in configure-utils.mk.
+# embedding them in mdo-config.mk.
 # 
 # embed-awk can be used to embed an awk script into any Makefile
 # The target below, embed-src, is a sample invocation.
@@ -11,7 +11,7 @@ AWK = awk
 embed-src:
 	$(eval sources = $(shell find src/ -name '*.awk' ))
 	@for src in ${sources}; do \
-		$(MAKE) -s -f update-embeds.mk embed-awk -- --target=configure-utils.mk --embed-file="$$src"; \
+		$(MAKE) -s -f update-embeds.mk embed-awk -- --target=mdo-config.mk --embed-file="$$src"; \
 	done;
 
 embed-awk: EMBED_FILE = ${--embed-file}
