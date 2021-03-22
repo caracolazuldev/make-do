@@ -16,9 +16,9 @@ BEGIN {
 		if ( name == "" ) { exit; }
 
 		prompt("Help text? "); getline help <STDIN;
-		prompt("export? [no] "); getline expt <STDIN;
+		prompt("export? [yes] "); getline no_exp <STDIN;
 
-		prefix = (expt) ? "export " : "";
+		prefix = (no_exp) ? "" : "export ";
 
 		print prefix name " = {{" name "}}# " help >> filename;
 		prompt(prefix name " = {{" name "}}# " help " >>" filename);
