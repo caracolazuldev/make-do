@@ -1,29 +1,30 @@
 
 BEGIN {
-	STDIN = "-";
-	filename = "";
-	prompt("\nFile-name? "); getline filename <STDIN;
-	if ( filename == "" ) { exit; }
+	STDIN = "-"
+	filename = ""
+	prompt("\nFile-name? "); getline filename <STDIN
+	if ( filename == "" ) { exit }
 
 	if ( match(filename,/\.conf$|\.tpl$/) ) {
 		gsub(/\.conf$|\.tpl$/, "", filename); # remove suffix
 	}
-	filename = filename ".tpl";
+	filename = filename ".tpl"
 
 	while ( 1 ) {
-		name = "";
-		prompt("\nConfig Name? "); getline name <STDIN;
-		if ( name == "" ) { exit; }
+		name = ""
+		prompt("\nConfig Name? "); getline name <STDIN
+		if ( name == "" ) { exit }
 
-		prompt("Help text? "); getline help <STDIN;
-		prompt("export? [yes] "); getline no_exp <STDIN;
+		prompt("Help text? "); getline help <STDIN
+		prompt("export? [yes] "); getline no_exp <STDIN
 
-		prefix = (no_exp) ? "" : "export ";
+		prefix = (no_exp) ? "" : "export " ;
 
-		print prefix name " = {{" name "}}# " help >> filename;
-		prompt(prefix name " = {{" name "}}# " help " >>" filename);
+		# TODO: make up your fucking mind about ?= 
+		print prefix name " = {{" name "}}# " help >> filename
+		prompt(prefix name " = {{" name "}}# " help " >>" filename)
 	}
-	exit;
+	exit
 }
 
 function ltrim(s) { sub(/^[ \t\r\n]+/, "", s); return s }
