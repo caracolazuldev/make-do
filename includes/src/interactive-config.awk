@@ -95,9 +95,9 @@ BEGIN {
 		if ( blnYes ) {
 			# reset line pointer;
 			close(FILENAME);
-			system(truncate -s 0 CONF_FILE);
+			system("truncate -s 0 " CONF_FILE);
 			while ( (getline line < FILENAME) > 0 ) { emit_config(line); }
-			prompt("Configuration saved in: " FILENAME "\n\n");
+			prompt("Configuration saved in: " CONF_FILE "\n\n");
 		}
 	}
 	exit;
