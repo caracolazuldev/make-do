@@ -27,9 +27,8 @@ BEGIN {
 
 		prefix = (no_exp) ? "" : "export " ;
 
-		# TODO: make up your fucking mind about ?= 
-		print prefix name " = {{" name "}}# " help >> filename
-		prompt(prefix name " = {{" name "}}# " help " >>" filename)
+		print prefix name " ?= {{" name "}}# " help >> filename
+		prompt(prefix name " ?= {{" name "}}# " help " >>" filename)
 	}
 	exit
 }
