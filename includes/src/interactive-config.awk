@@ -45,10 +45,10 @@ function prompt_for_var(line) {
 	declaration = parse_declaration(line);
 	the_var = parse_var(line);
 	default_val = trim(
-		( (configs[the_var]) ? configs[the_var] : ENVIRON[the_var] )
+		( (configs[the_var]) ? configs[the_var] : ENVIRON[the_var] ) \
 	);
 	helptext = parse_help(line);
-	if (helptext) { helptext = "(" helptext ") "; }
+	if (helptext) helptext = "(" helptext ") "
 
 	prompt( helptext declaration "? [" default_val "] ");
 	if ( ! getline usrReply < "-" ) { exit 0; }
