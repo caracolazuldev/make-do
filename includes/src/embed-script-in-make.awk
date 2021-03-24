@@ -22,22 +22,34 @@
 #      SOURCE_FILE="${TMP_SOURCE}" $(AWK) -f src/embed-script-in-make.awk <${TMP_TARGET} >${OUTFILE}
 #      rm ${TMP_TARGET} ${TMP_SOURCE}
 #
+
+function rtrim(s) { sub(/[ \t\r\n]+$/, "", s); return s }
+
+# read an entire file at once
+function readfile(file,     contents)
+{
+    while ((getline line < file) > 0)
+        contents = contents line
+    close(file)
+
+    return contents
+}
+
 BEGIN {
-    DEFINE_BODY = readfile(ENVIRON["SOURCE_FILE"]);
+    DEFINE_BODY = readfile(ENVIRON["SOURCE_FILE"])
     
-    DEFINE_NAME = ENVIRON["DEFINE_NAME"];
-    if (! DEFINE_NAME ) { DEFINE_NAME = ENVIRON["SOURCE_FILE"]; }
-    DEFINE_NAME = rtrim(DEFINE_NAME);
+    DEFINE_NAME = ENVIRON["DEFINE_NAME"]
+    if (! DEFINE_NAME ) DEFINE_NAME = ENVIRON["SOURCE_FILE"]
+    DEFINE_NAME = rtrim(DEFINE_NAME)
 
     # we expect recipe-escape.awk to include a trailing-backslash:
-    DEFINE_BODY = rtrim(DEFINE_BODY);
-    gsub(/\\$/, "", DEFINE_BODY);
+    gsub(/\\$/, "", DEFINE_BODY)
 
     # wrap the source with an awk invocation.
-    DEFINE_BODY = "$(AWK) '" DEFINE_BODY "'";
+    DEFINE_BODY = "$(AWK) '" rtrim(DEFINE_BODY) "'"
    
-    start_define = "define[[:blank:]]+" DEFINE_NAME "[[:blank:]]?$";
-    definition = "define " DEFINE_NAME "\n" DEFINE_BODY "\nendef";
+    start_define = "define[[:blank:]]+" DEFINE_NAME "[[:blank:]]?$"
+    definition = "define " DEFINE_NAME "\n" DEFINE_BODY "\nendef"
 }
 
 /define/,/^endef/ {
@@ -56,16 +68,4 @@ END {
     if ( ! found ) {
         print "\n" definition;
     }
-}
-
-function rtrim(s) { sub(/[ \t\r\n]+$/, "", s); return s }
-
-# read an entire file at once
-function readfile(file,     contents)
-{
-    while ((getline line < file) > 0)
-        contents = contents line
-    close(file)
-
-    return contents
 }
