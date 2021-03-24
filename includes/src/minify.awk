@@ -37,8 +37,7 @@
         }
     }
 
-    gsub(/[\\]?$/, " "); # rm continuations
-    gsub(/[[:blank:]]+$/, "") # rm trailing whitespace again
+    gsub(/\\$/, " "); # rm continuations
     gsub(/[[:space:]]{2,}/, " ") # rm repeated whitespace
     
     if ( $0 ~ /do$|else$/ ) $0 = $0 " " # ensure trailing space
