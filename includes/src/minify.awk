@@ -1,5 +1,5 @@
 # # #
-# Minify an awk script so it is a single line. See code
+# Minify an awk script so it is a single line.
 # Created for the purpose of embedding in a make macro (define statement).
 #
 # ! NOTE: tabs and consecutive spaces in strings will be altered by this script.
@@ -8,7 +8,7 @@
 #       is split over more than 2 lines, use explicit line-continuation ( \ ).
 #
 # ! NOTE: lines with hashes in strings or regex can not support the same 
-#       delimiter in comments; no error is generated for these cases.
+#       delimiter in comments; no error is generated for these cases and your code will fail.
 #
 
 {
