@@ -17,7 +17,7 @@ include mdo-require.mk
 # - CMS_ADMIN_EMAIL
 #
 
-WEB_USER ?= www-data
+WEB_USER ?= ${WEB_USER}
 WP_PLUGINS_SRC ?= ./
 WP_PLUGINS_DIR ?= ${WEB_ROOT}wp-content/plugins/# where to deploy wordpress plugins
 
@@ -143,10 +143,10 @@ wp-enable-debug: | require-env-WEB_ROOT
 wp-debug-log: ${WEB_ROOT}wp-content/debug.log | require-env-WEB_ROOT
 	tail -fn100 $<
 
-wp-file-acl: | require-env-WEB_ROOT
+wp-file-acl: | require-env-WEB_ROOT require-env-WEB_USER
 	@# first clear facls set:
-	sudo setfacl -Rx 'g:www-data,d:g:www-data' ${WEB_ROOT}wp-content
-	sudo setfacl -Rm 'm:rwx,d:u::rwx,d:g:www-data:rwX,u::rwX,g:www-data:rwX' ${WEB_ROOT}wp-content
+	sudo setfacl -Rx 'g:${WEB_USER},d:g:${WEB_USER}' ${WEB_ROOT}wp-content
+	sudo setfacl -Rm 'm:rwx,d:u::rwx,d:g:${WEB_USER}:rwX,u::rwX,g:${WEB_USER}:rwX' ${WEB_ROOT}wp-content
 
 # run wp as current user (bypass WP_CLI)
 wp-install: WP_CLI = ${wp-cli-bin} --path=${WEB_ROOT}
