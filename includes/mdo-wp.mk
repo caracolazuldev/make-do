@@ -8,9 +8,9 @@ include mdo-require.mk
 # - WP_PLUGINS_DIR [${WEB_ROOT}wp-content/plugins/] 
 #
 # WP INSTALL REQUIRES:
-# - DB_CMS_DB
-# - DB_USER
-# - DB_PASSWORD
+# - MYSQL_DATABASE
+# - MYSQL_USER
+# - MYSQL_PASSWORD
 # - CMS_URL
 # - CMS_ADMIN_USER
 # - CMS_ADMIN_PASSWORD
@@ -150,17 +150,17 @@ wp-file-acl: | require-env-WEB_ROOT
 
 # run wp as current user (bypass WP_CLI)
 wp-install: WP_CLI = ${wp-cli-bin} --path=${WEB_ROOT}
-wp-install: ${WEB_ROOT} | require-env-DB_CMS_DB require-env-DB_USER require-env-DB_PASSWORD require-env-CMS_URL require-env-CMS_ADMIN_USER require-env-CMS_ADMIN_PASSWORD require-env-CMS_ADMIN_EMAIL
+wp-install: ${WEB_ROOT} | require-env-MYSQL_DATABASE require-env-MYSQL_USER require-env-MYSQL_PASSWORD require-env-CMS_URL require-env-CMS_ADMIN_USER require-env-CMS_ADMIN_PASSWORD require-env-CMS_ADMIN_EMAIL
 	${WP_CLI} core download
 	# ${WP_CLI} core config
-	@${WP_CLI} core config --dbname=${DB_CMS_DB} --dbuser=${DB_USER} --dbpass=${DB_PASSWORD}
+	@${WP_CLI} core config --dbname=${MYSQL_DATABASE} --dbuser=${MYSQL_USER} --dbpass=${MYSQL_PASSWORD}
 	${WP_CLI} db create
 	# ${WP_CLI} core install
 	@${WP_CLI} core install --url="${CMS_URL}" --title="${CMS_TITLE}" --admin_user="${CMS_ADMIN_USER}" --admin_password="${CMS_ADMIN_PASSWORD}" --admin_email="${CMS_ADMIN_EMAIL}"
 	echo "$$WP_BASE_HTACCESS" > ${WEB_ROOT}.htaccess
 	
-wp-destroy: | require-env-WEB_ROOT require-env-DB_CMS_DB
-	- $(WP_CLI) db query 'DROP DATABASE IF EXISTS ${DB_CMS_DB}'
+wp-destroy: | require-env-WEB_ROOT require-env-MYSQL_DATABASE
+	- $(WP_CLI) db query 'DROP DATABASE IF EXISTS ${MYSQL_DATABASE}'
 	- rm -rf ${WEB_ROOT}
 
 # # #
