@@ -137,7 +137,7 @@ endef
 CACHED_DG := ${.DEFAULT_GOAL}
 
 wp-enable-debug: | require-env-WEB_ROOT
-	- cd ${WEB_ROOT} && echo "$$WP_DEBUG_PATCH" | patch -f -F 0
+	- cd ${WEB_ROOT} && echo "$$WP_DEBUG_PATCH" | patch -f
 	touch ${WEB_ROOT}wp-content/debug.log
 
 wp-debug-log: ${WEB_ROOT}wp-content/debug.log | require-env-WEB_ROOT
