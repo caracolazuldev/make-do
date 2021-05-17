@@ -154,7 +154,7 @@ wp-install: MYSQL_HOST ?= localhost
 wp-install: ${WEB_ROOT} | require-env-MYSQL_DATABASE require-env-MYSQL_USER require-env-MYSQL_PASSWORD require-env-CMS_URL require-env-CMS_ADMIN_USER require-env-CMS_ADMIN_PASSWORD require-env-CMS_ADMIN_EMAIL
 	${WP_CLI} core download
 	# ${WP_CLI} core config
-	@${WP_CLI} core config --dbhost=${MYSQ_HOST} --dbname=${MYSQL_DATABASE} --dbuser=${MYSQL_USER} --dbpass=${MYSQL_PASSWORD}
+	@${WP_CLI} core config --dbhost=${MYSQL_HOST} --dbname=${MYSQL_DATABASE} --dbuser=${MYSQL_USER} --dbpass=${MYSQL_PASSWORD}
 	${WP_CLI} db create
 	# ${WP_CLI} core install
 	@${WP_CLI} core install --url="${CMS_URL}" --title="${CMS_TITLE}" --admin_user="${CMS_ADMIN_USER}" --admin_password="${CMS_ADMIN_PASSWORD}" --admin_email="${CMS_ADMIN_EMAIL}"
