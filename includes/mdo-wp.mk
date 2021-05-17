@@ -162,7 +162,8 @@ wp-install: ${WEB_ROOT} | require-env-MYSQL_DATABASE require-env-MYSQL_USER requ
 	
 wp-destroy: | require-env-WEB_ROOT require-env-MYSQL_DATABASE
 	- $(WP_CLI) db query 'DROP DATABASE IF EXISTS ${MYSQL_DATABASE}'
-	- rm -rf ${WEB_ROOT}{*,.*}
+	- rm -rf ${WEB_ROOT}*
+	- rm -rf ${WEB_ROOT}.*
 
 # # #
 # END Targets
