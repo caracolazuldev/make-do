@@ -17,7 +17,7 @@ include mdo-require.mk
 # - CMS_ADMIN_EMAIL
 #
 
-WEB_USER ?= ${WEB_USER}
+WEB_USER ?= www-data
 WP_PLUGINS_SRC ?= ./
 WP_PLUGINS_DIR ?= ${WEB_ROOT}wp-content/plugins/# where to deploy wordpress plugins
 
