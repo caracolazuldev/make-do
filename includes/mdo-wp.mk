@@ -8,6 +8,7 @@ include mdo-require.mk
 # - WP_PLUGINS_DIR [${WEB_ROOT}wp-content/plugins/] 
 #
 # WP INSTALL REQUIRES:
+# - MYSQL_HOST
 # - MYSQL_DATABASE
 # - MYSQL_USER
 # - MYSQL_PASSWORD
