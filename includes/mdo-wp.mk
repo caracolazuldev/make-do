@@ -191,7 +191,10 @@ wp-install: ${WEB_ROOT} | require-env-MYSQL_DATABASE require-env-MYSQL_USER requ
 	echo "$$WP_BASE_HTACCESS" > ${WEB_ROOT}.htaccess
 	${WP_CLI} plugin delete hello
 	${WP_CLI} plugin update --all
+	# Comments for posts are disabled by default:
 	${WP_CLI} option set default_comment_status closed
+	# Login is required to comment:
+	${WP_CLI} option set comment_registration 1 
 	
 wp-destroy: | require-env-WEB_ROOT require-env-MYSQL_DATABASE
 	- $(WP_CLI) db query 'DROP DATABASE IF EXISTS ${MYSQL_DATABASE}'
