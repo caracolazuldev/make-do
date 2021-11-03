@@ -189,6 +189,9 @@ wp-install: ${WEB_ROOT} | require-env-MYSQL_DATABASE require-env-MYSQL_USER requ
 	# ${WP_CLI} core install
 	@${WP_CLI} core install --url="${CMS_URL}" --title="${CMS_TITLE}" --admin_user="${CMS_ADMIN_USER}" --admin_password="${CMS_ADMIN_PASSWORD}" --admin_email="${CMS_ADMIN_EMAIL}"
 	echo "$$WP_BASE_HTACCESS" > ${WEB_ROOT}.htaccess
+	${WP_CLI} plugin delete hello
+	${WP_CLI} plugin update --all
+	${WP_CLI} option set default_comment_status closed
 	
 wp-destroy: | require-env-WEB_ROOT require-env-MYSQL_DATABASE
 	- $(WP_CLI) db query 'DROP DATABASE IF EXISTS ${MYSQL_DATABASE}'
