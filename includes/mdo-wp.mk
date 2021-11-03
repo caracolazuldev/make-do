@@ -108,7 +108,6 @@ define WP_DEBUG_PATCH
  /** The name of the database for WordPress */
 
 endef
-export WP_DEBUG_PATCH
 
 # to create a default .htaccess file:
 # echo "$$WP_BASE_HTACCESS" > ${WEB_ROOT}.htaccess
@@ -125,7 +124,6 @@ RewriteRule . /index.php [L]
 
 # END WordPress
 endef
-export WP_BASE_HTACCESS
 
 define wp-permalink-postname
 	$(WP_CLI) option update permalink_structure '/%postname%'
@@ -152,12 +150,12 @@ define DISABLE_WP_MAIL
 
 endef
 
-wp-disable-mail: export DISABLE_WP_MAIL
 wp-disable-mail:
+	@$(eval export DISABLE_WP_MAIL)
 	- cd ${WEB_ROOT} && echo "$$DISABLE_WP_MAIL" | patch -f -F 3 -p 0
 
-wp-enable-mail: export DISABLE_WP_MAIL
 wp-enable-mail:
+	@$(eval export DISABLE_WP_MAIL)
 	- cd ${WEB_ROOT} && echo "$$DISABLE_WP_MAIL" | patch -R -f -F 3 -p 0
 
 # # # 
@@ -167,6 +165,7 @@ wp-enable-mail:
 CACHED_DG := ${.DEFAULT_GOAL}
 
 wp-enable-debug: | require-env-WEB_ROOT
+	@$(eval export WP_DEBUG_PATCH)
 	- cd ${WEB_ROOT} && echo "$$WP_DEBUG_PATCH" | patch -f
 	touch ${WEB_ROOT}wp-content/debug.log
 
@@ -182,6 +181,7 @@ wp-file-acl: | require-env-WEB_ROOT require-env-WEB_USER
 wp-install: WP_CLI = ${wp-cli-bin} --path=${WEB_ROOT}
 wp-install: MYSQL_HOST ?= localhost
 wp-install: ${WEB_ROOT} | require-env-MYSQL_DATABASE require-env-MYSQL_USER require-env-MYSQL_PASSWORD require-env-CMS_URL require-env-CMS_ADMIN_USER require-env-CMS_ADMIN_PASSWORD require-env-CMS_ADMIN_EMAIL
+	@$(eval export WP_BASE_HTACCESS)
 	${WP_CLI} core download
 	# ${WP_CLI} core config
 	@${WP_CLI} core config --dbhost=${MYSQL_HOST} --dbname=${MYSQL_DATABASE} --dbuser=${MYSQL_USER} --dbpass=${MYSQL_PASSWORD}
