@@ -131,6 +131,35 @@ define wp-permalink-postname
 	$(WP_CLI) option update permalink_structure '/%postname%'
 endef
 
+define DISABLE_WP_MAIL
+--- wp-includes/pluggable.php
++++ wp-includes/pluggable.php
+@@ -485,7 +485,13 @@
+ 
+ 		// Send!
+ 		try {
+-			return $$phpmailer->send();
++			//return $$phpmailer->send();
++			/**
++			 * DISABLE EMAIL SENDS FOR STAGE
++			 */
++			$$mail_data = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
++			error_log( print_r( $$mail_data, true ) );
++			return true;
+ 		} catch ( phpmailerException $$e ) {
+ 
+ 			$$mail_error_data                             = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
+
+endef
+
+wp-disable-mail: export DISABLE_WP_MAIL
+wp-disable-mail:
+	- cd ${WEB_ROOT} && echo "$$DISABLE_WP_MAIL" | patch -f -F 3 -p 0
+
+wp-enable-mail: export DISABLE_WP_MAIL
+wp-enable-mail:
+	- cd ${WEB_ROOT} && echo "$$DISABLE_WP_MAIL" | patch -R -f -F 3 -p 0
+
 # # # 
 # Targets
 # # #
