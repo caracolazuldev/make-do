@@ -154,6 +154,7 @@ endef
 # Targets
 # # #
 
+# Prevent targets changing the default goal
 CACHED_DG := ${.DEFAULT_GOAL}
 
 wp-disable-mail:
@@ -203,5 +204,5 @@ wp-destroy: | require-env-WEB_ROOT require-env-MYSQL_DATABASE
 
 # # #
 # END Targets
-# Rset .DEFAULT_GOAL
+# Reset .DEFAULT_GOAL
 .DEFAULT_GOAL := ${CACHED_DG}
