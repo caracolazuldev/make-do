@@ -150,6 +150,12 @@ define DISABLE_WP_MAIL
 
 endef
 
+# # # 
+# Targets
+# # #
+
+CACHED_DG := ${.DEFAULT_GOAL}
+
 wp-disable-mail:
 	@$(eval export DISABLE_WP_MAIL)
 	- cd ${WEB_ROOT} && echo "$$DISABLE_WP_MAIL" | patch -f -F 3 -p 0
@@ -157,12 +163,6 @@ wp-disable-mail:
 wp-enable-mail:
 	@$(eval export DISABLE_WP_MAIL)
 	- cd ${WEB_ROOT} && echo "$$DISABLE_WP_MAIL" | patch -R -f -F 3 -p 0
-
-# # # 
-# Targets
-# # #
-
-CACHED_DG := ${.DEFAULT_GOAL}
 
 wp-enable-debug: | require-env-WEB_ROOT
 	@$(eval export WP_DEBUG_PATCH)
