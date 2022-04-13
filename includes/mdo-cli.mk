@@ -1,7 +1,7 @@
 
 define user-confirm
 	@while true; do \
-	  read -p $(strip ${1})' [y/n]: ' yn ;\
+	  read -p '$(strip ${1})'' [y/n]: ' yn ;\
 		case $$yn in \
 			[Yy]* ) break;; \
 			[Nn]* ) echo "Aborted" && exit 1;; \
