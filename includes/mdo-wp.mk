@@ -132,21 +132,21 @@ endef
 define DISABLE_WP_MAIL
 --- wp-includes/pluggable.php
 +++ wp-includes/pluggable.php
-@@ -485,7 +485,13 @@
+@@ -541,7 +541,13 @@
  
  		// Send!
  		try {
--			return $$phpmailer->send();
-+			//return $$phpmailer->send();
+-			$$send = $$phpmailer->send();
++			//$send = $$phpmailer->send();
 +			/**
 +			 * DISABLE EMAIL SENDS FOR STAGE
 +			 */
 +			$$mail_data = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
 +			error_log( print_r( $$mail_data, true ) );
 +			return true;
- 		} catch ( phpmailerException $$e ) {
  
- 			$$mail_error_data                             = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
+ 			/**
+ 			 * Fires after PHPMailer has successfully sent a mail.
 
 endef
 
