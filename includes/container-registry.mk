@@ -29,6 +29,12 @@ TAG_NAME ?= $(shell date +v%Y%m%d-%H%M%S)
 
 BUILD_IMAGE_DIR ?= $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
+ifdef NO_CACHE
+$(info BUILD CACHE DISABLED)
+else
+$(info USING BUILD CACHE)
+endif
+
 login:
 	# Logging in to the Container Registry ${CI_REGISTRY}
 	@docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
