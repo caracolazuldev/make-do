@@ -1,7 +1,7 @@
 # # #
 # Build/Tag (and optionally publish) Docker images
 #
-# Make-do Makefile Library Version: 2.0.0
+# Make-do Makefile Library Version: 2.0.1
 # https://github.com/caracolazuldev/make-do
 #
 # Default tag is the current date and time in the format vYYYYMMDD-HHMMSS
