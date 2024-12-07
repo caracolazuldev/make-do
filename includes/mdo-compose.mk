@@ -69,15 +69,17 @@ endif
 #
 
 # # #
-# include ENV files conf/*.env
-define compose-env-includes
+# Default ENV file includes
+# conf/*.env
+# Does not descend into subdirectories (-maxdepth 1)
+define default-env-includes
 $(strip \
-	$(shell find conf -type f -name '*.env' | sort) \
+	$(shell find conf -maxdepth 1 -type f -name '*.env' | sort) \
 )
 endef
 
 # default to all env files
-ENV_INCLUDES ?= ${compose-env-includes}
+ENV_INCLUDES ?= ${default-env-includes}
 
 .env: ${ENV_INCLUDES}
 ifndef ENV_INCLUDES
@@ -101,20 +103,22 @@ endif
 #
 
 # # #
-# default YAML files docker/*.yml|*.yaml
+# Default compose files
+# docker/*.yml|*.yaml
 # *.profile.* files sorted last
-define compose-profile-includes
+# Does not descend into subdirectories (-maxdepth 1)
+define default-compose-file-includes
 $(strip \
-	$(shell find docker -type f \
+	$(shell find docker -maxdepth 1 -type f \
 		-name '*.yml' -o -name '*.yaml' \
 		| grep -v profile | sort) \
-	$(shell find docker -type f \
+	$(shell find docker -maxdepth 1 -type f \
 		-name '*.profile.yml' -o -name '*.profile.yaml' | sort) \
 )
 endef
 
 # default to all profile.yaml and .yaml files
-COMPOSE_FILES ?= ${compose-profile-includes}
+COMPOSE_FILES ?= ${default-compose-file-includes}
 
 ifdef DEBUG
 $(info COMPOSE_FILES=${COMPOSE_FILES})
