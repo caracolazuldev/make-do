@@ -38,7 +38,7 @@ uninstall: $(foreach inc,${MDO_INCLUDES},uninstall-${inc})
 includes/mdo-config.mk:
 	$(eval sources = $(shell find src/ -name '*.awk' ))
 	@for src in ${sources}; do \
-		$(MAKE) -s -f includes/embed-awk.mk embed-awk -- --target=$@ --embed-file="$$src"; \
+		$(MAKE) -s -f includes/mdo-embed-awk.mk embed-awk -- --target=$@ --embed-file="$$src"; \
 	done;
 
 release: includes/mdo-config.mk | require-env-RELEASE_VERSION
