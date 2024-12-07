@@ -78,7 +78,6 @@ $(strip \
 )
 endef
 
-# default to all env files
 ENV_INCLUDES ?= ${default-env-includes}
 
 .env: ${ENV_INCLUDES}
@@ -87,8 +86,7 @@ ifndef ENV_INCLUDES
 endif
 	@# Ensure that each file ends with a newline
 	@for file in $^; do \
-		if [ -n "$$(tail -c 1 "$$file" | tr -d '
-')" ]; then \
+		if [ -n "$$(tail -c 1 "$$file" | tr -d '\n')" ]; then \
 			echo >> "$$file"; \
 		fi; \
 	done
@@ -117,7 +115,6 @@ $(strip \
 )
 endef
 
-# default to all profile.yaml and .yaml files
 COMPOSE_FILES ?= ${default-compose-file-includes}
 
 ifdef DEBUG
