@@ -40,3 +40,6 @@ includes/mdo-config.mk:
 	@for src in ${sources}; do \
 		$(MAKE) -s -f includes/embed-awk.mk embed-awk -- --target=$@ --embed-file="$$src"; \
 	done;
+
+release: includes/mdo-config.mk | require-env-RELEASE_VERSION
+	./update-version.sh ${RELEASE_VERSION}

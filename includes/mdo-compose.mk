@@ -1,7 +1,7 @@
 # # #
 # Docker Compose Utilities
 #
-# Make-do Makefile Library Version: 2.0.2
+# Make-do Makefile Library Version: 2.0.0
 # https://github.com/caracolazuldev/make-do
 # # #
 
