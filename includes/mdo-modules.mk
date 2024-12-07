@@ -1,7 +1,10 @@
 # # #
 #
-# Module Framework 
-# (Deprecated? - needs work)
+# Module Framework (Deprecated? - needs work)
+#
+# Make-do Makefile Library Version: 2.0.0
+# https://github.com/caracolazuldev/make-do
+#
 #
 # Create functional units (modules) of make scripts.
 # Eases keeping build directories separate from build-scripts.

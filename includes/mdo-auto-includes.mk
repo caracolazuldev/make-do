@@ -1,6 +1,9 @@
 ######
 # DEPRECATED: it's good to declare your dependencies.
 #
+# Make-do Makefile Library Version: 2.0.0
+# https://github.com/caracolazuldev/make-do
+#
 # Magic make, looks for *.mk files in sub-directories and includes them.
 # Default target just lists includes.
 #

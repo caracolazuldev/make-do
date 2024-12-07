@@ -1,3 +1,9 @@
+# # #
+# Docker Compose Utilities
+#
+# Make-do Makefile Library Version: 2.0.2
+# https://github.com/caracolazuldev/make-do
+# # #
 
 # enable use of env's in make recipes
 # and help keep .env up to date since includes are always prerequisites

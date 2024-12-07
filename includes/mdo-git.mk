@@ -1,3 +1,10 @@
+# # #
+# Git Repo Utilities
+#
+# Make-do Makefile Library Version: 2.0.0
+# https://github.com/caracolazuldev/make-do
+# # #
+
 include mdo-require.mk
 
 define HELP_TEXT
@@ -20,7 +27,7 @@ ENVIRONMENT CONFIG
 	GIT_REPOS		repo names
 
 	- optional overrides -
-	GITHUB_ORG		
+	GITHUB_ORG
 	GIT_REPOS_BASE_URL	if not hosted on github.com
 
 endef
@@ -79,7 +86,7 @@ logs: $(foreach repo,${GIT_REPOS}, ${repo}-logs)
 
 ##
 # needed to insert repo name on each line
-define worklog.awk 
+define worklog.awk
 $(AWK) 'BEGIN {REPO = ENVIRON["GIT_REPO"]}{print $$0 " in " REPO} '
 endef
 
@@ -99,7 +106,7 @@ git-worklog-date-since := $(shell date --date '-7 days' '+%Y-%m-%d')
 	--pretty=format:'${git-worklog-fmt}' \
 	| ${worklog.awk}
 
-worklog: 
+worklog:
 	@ $(MAKE) -s $(foreach repo,${GIT_REPOS}, ${repo}-git-timelog) | sort
 
 %-pull:

@@ -1,3 +1,8 @@
+# # #
+#
+# Make-do Makefile Library Version: 2.0.0
+# https://github.com/caracolazuldev/make-do
+# # #
 
 define user-confirm
 	@while true; do \

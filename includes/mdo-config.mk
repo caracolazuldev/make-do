@@ -1,25 +1,33 @@
+# # #
+# Configuration Utils
+#
+# Make-do Makefile Library Version: 2.0.2
+# https://github.com/caracolazuldev/make-do
+#
+# Utilities for using and managing environment configuration files.
+# # #
 
 define DOCUMENTATION :=
 
 # Utilities for using and managing environment configuration files.
-Automatically includes files with both 
-  - the suffix, '.conf' 
+Automatically includes files with both
+  - the suffix, '.conf'
   - and that have a `.tpl` file in `conf/`
 
 Auto-discovered configs are listed in CONFIG_INCLUDES.
 If the files conf/project.tpl, conf/db.tpl exist:
 CONFIG_INCLUDES will contain conf/project.conf conf/db.conf
-Auto-inclusion can be disabled by setting a value for CONFIG_INCLUDES before 
+Auto-inclusion can be disabled by setting a value for CONFIG_INCLUDES before
 this file is executed.
- 
+
 ## FEATURES:
 
 Write a make recipe to interactively generate a file from any template
 using the make function, $(interactive-config.awk)
 	`$$(interactive-config.awk) template filename`
 
-If a variable is defined in the environment, the value will be 
-offered as the default. Since the config file is always loaded first, 
+If a variable is defined in the environment, the value will be
+offered as the default. Since the config file is always loaded first,
 existing configs will be loaded as default values.
 
 Non-interactively replace {{TOKEN}}'s in a file:
@@ -33,32 +41,32 @@ configuration files to be automatically (and interactively) generated.
 ## CREATING CONFIG TEMPLATES:
 
 Use `make add-config` to interactively add new configs to your template.
-Specify the basename of your config file, and your new variable will be 
-appended to the template file. 
+Specify the basename of your config file, and your new variable will be
+appended to the template file.
 
 (TIP: You can leave the file extension off of your config file and it will default to .conf. )
 
-Example Config File Declaration: 
+Example Config File Declaration:
 	`export PROJECT_ROOT ?= /var/www/# comments are used in user-prompts.`
 
-Interactive Prompt: 
+Interactive Prompt:
 	`PROJECT_ROOT ( comments are used in user-prompts. ) = [/var/www/]?`
 
-TIP: include a trailing-slash when configuring paths. 
+TIP: include a trailing-slash when configuring paths.
 TIP: terminate paths with a hash/sharp to avoid the error of
  trailing-white-space.
-WARNING: escape spaces in paths in your config-include list. 
+WARNING: escape spaces in paths in your config-include list.
 
-## UPDATING CONFIG FILES: 
+## UPDATING CONFIG FILES:
 
 Use the `save-conf` or `non-interactive` targets to update any config files
 auto-discoverd or listed in CONFIG_INCLUDES. This will have no effect unless
-your variable declarations use the conditional assignment operator, `?=` to 
+your variable declarations use the conditional assignment operator, `?=` to
 allow the environment precedence over the file.
 
 The target, `reconfigure` will interactively prompt you to enter the config
-values. 
- 
+values.
+
 ## EXTENDING MAKEFILES WITH GNU AWK SCRIPTS:
 
 Several awk scripts distributed in this package are embedded
@@ -97,7 +105,7 @@ endif
 	@$(REPLACE_TOKENS) <${*}.tpl >${*}.conf
 
 # # #
-# -Rr, doesn't load special vars or targets; 
+# -Rr, doesn't load special vars or targets;
 # -B forces re-building (the config files);
 reconfigure:
 	@$(MAKE) -RrBs ${CONFIG_INCLUDES}
@@ -113,13 +121,13 @@ list-configs:
 # # #
 # Prompts to declare a new variable and append to a template.
 #
-add-config: 
+add-config:
 	@${add-config.awk}
 .PHONY: add-config
 
 # # #
 # Shell command to replace {{TOKENs}} in a file
-# 
+#
 # ${REPLACE_TOKENS} <file.in >file.out
 REPLACE_TOKENS = perl -p -e 's%\{\{([^}]+)\}\}%defined $$ENV{$$1} ? $$ENV{$$1} : $$&%eg'
 
@@ -127,7 +135,7 @@ REPLACE_TOKENS = perl -p -e 's%\{\{([^}]+)\}\}%defined $$ENV{$$1} ? $$ENV{$$1} :
 # Shell-escape spaces.
 # e.g. $(call escape-spaces, string with spaces)
 #
-space := 
+space :=
 space += # hack that exploits implicit space added when concatenating assignment
 escape-spaces = $(subst ${space},\${space},$(strip $1))
 
@@ -147,7 +155,7 @@ recipe-minify:
 	$(eval INFILE ?= ${--in})
 	$(eval OUTFILE ?= ${--out})
 	$(info processing ${INFILE})
-	@echo 
+	@echo
 	@$(minify.awk) <${INFILE} | $(recipe-escape.awk) >${OUTFILE}
 .PHONY: recipe-minify
 

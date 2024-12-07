@@ -1,11 +1,13 @@
-include mdo-require.mk
 # # #
 # Gnu Make functions for Wordpress developers
+#
+# Make-do Makefile Library Version: 2.0.0
+# https://github.com/caracolazuldev/make-do
 #
 # REQUIRES:
 # - WEB_ROOT
 # - WP_PLUGINS_SRC [./]
-# - WP_PLUGINS_DIR [${WEB_ROOT}wp-content/plugins/] 
+# - WP_PLUGINS_DIR [${WEB_ROOT}wp-content/plugins/]
 #
 # WP INSTALL REQUIRES:
 # - MYSQL_HOST
@@ -17,6 +19,7 @@ include mdo-require.mk
 # - CMS_ADMIN_PASSWORD
 # - CMS_ADMIN_EMAIL
 #
+include mdo-require.mk
 
 WEB_USER ?= www-data
 WP_PLUGINS_SRC ?= ./
@@ -66,7 +69,7 @@ plugin-%.zip:
 	$(eval repo := '$(shell find ${WP_PLUGINS_SRC} -type d -name ${*})')
 	#
 	# WARNING: guessed plugin location ${repo}
-	# 
+	#
 	$(MAKE) -C ${repo}
 
 define wp-deploy-plugin
@@ -81,7 +84,7 @@ endef
 # # #
 # for publicly listed plugins
 #
-WP_INSTALL_PLUGIN := $(WP_CLI) plugin install --activate 
+WP_INSTALL_PLUGIN := $(WP_CLI) plugin install --activate
 
 define wp-deploy-theme
 	$(eval theme := '$(shell find ${WP_PLUGINS_SRC} -name $(strip ${1}).zip)')
@@ -133,7 +136,7 @@ define DISABLE_WP_MAIL
 --- wp-includes/pluggable.php
 +++ wp-includes/pluggable.php
 @@ -541,7 +541,13 @@
- 
+
  		// Send!
  		try {
 -			$$send = $$phpmailer->send();
@@ -144,13 +147,13 @@ define DISABLE_WP_MAIL
 +			$$mail_data = compact( 'to', 'subject', 'message', 'headers', 'attachments' );
 +			error_log( print_r( $$mail_data, true ) );
 +			return true;
- 
+
  			/**
  			 * Fires after PHPMailer has successfully sent a mail.
 
 endef
 
-# # # 
+# # #
 # Targets
 # # #
 
@@ -195,8 +198,8 @@ wp-install: ${WEB_ROOT} | require-env-MYSQL_DATABASE require-env-MYSQL_USER requ
 	# Comments for posts are disabled by default:
 	${WP_CLI} option set default_comment_status closed
 	# Login is required to comment:
-	${WP_CLI} option set comment_registration 1 
-	
+	${WP_CLI} option set comment_registration 1
+
 wp-destroy: | require-env-WEB_ROOT require-env-MYSQL_DATABASE
 	- $(WP_CLI) db query 'DROP DATABASE IF EXISTS ${MYSQL_DATABASE}'
 	- rm -rf ${WEB_ROOT}*
