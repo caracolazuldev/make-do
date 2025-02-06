@@ -38,8 +38,11 @@ services: ## List all services
 #
 
 task-up = $(if $(shell $(DKC) ps -q $1),$1 is running)
-exec-or-run = $(if $(call task-up,$1),exec,run --rm) $1
 warn-if-not-up = $(if $(call task-up,$1),,$(warn $1 is not running))
+#
+#optional second argument for args to docker compose run/exec
+# e.g. --workdir ...
+exec-or-run = $(if $(call task-up,$1),exec,run --rm) $2 $1
 
 #
 # Wrapped Docker Compose commands
