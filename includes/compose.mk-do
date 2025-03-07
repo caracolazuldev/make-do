@@ -51,18 +51,28 @@ exec-or-run = $(if $(call task-up,$1),exec,run --rm) $2 $1
 # Commands we especially want to ensure have an up-to-date compose.yaml file
 # or that we alter the default behavior (e.g. up -d, run --rm)
 # and a couple included for symmetry (down, exec)
-# If your command arguments conflict with this list, you will have to
-# override it to exclude the keyword that appears in your command, and 
-# this feature will not be available for that docker-compose command.
-SUB_CMD_ABLE ?= up down run exec logs
+#
+# Note: to pass options, you need to prevent your shell from expanding them using --.
+# e.g. make -- run --entrypoint /bin/bash my-service
+#
+# WARNING: potential for conflicts when using run or exec if the command contains 
+# one of these keywords. You may override this list by setting SUB_CMD_ABLE 
+# to exclude the conflict. Or, you mayb simply choose to create a custom target
+# to invoke `docker compose` directly.
+#
+SUB_CMD_ABLE ?= up down build run exec logs
 
-# passes additional arguments to docker compose using $(filter-out $@,$(MAKECMDGOALS))
+# prevents the conflict with `build` by short-circuiting
+# when `run` or `exec` were also passed.
 ${SUB_CMD_ABLE}: .env ${COMPOSE_FILENAME}
-	$(DKC) $@ \
-		$(if $(filter $@,up),-d) \
-		$(if $(filter $@,run),--rm) \
-		$(if $(filter $@,logs),--follow) \
-		$(filter-out $@,$(MAKECMDGOALS))
+	$(or \
+		$(and $(filter build,$@),$(filter run exec,$(MAKECMDGOALS)), ), \
+		$(DKC) $@ \
+			$(if $(filter $@,up),-d) \
+			$(if $(filter $@,run),--rm) \
+			$(if $(filter $@,logs),--follow) \
+			$(wordlist 2, $(words $(MAKECMDGOALS)), $(MAKECMDGOALS)) \
+	)
 
 ifneq (,$(filter ${SUB_CMD_ABLE},$(MAKECMDGOALS)))
 # Prevent errors when non-targets are passed for sub-commands
