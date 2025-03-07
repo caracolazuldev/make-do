@@ -25,7 +25,13 @@ MAKEFLAGS += --no-builtin-rules
 docker-platform:
 	$(info DOCKER_DEFAULT_PLATFORM: $(DOCKER_DEFAULT_PLATFORM))
 
-rebuild: .env ${COMPOSE_FILENAME} stop
+
+#
+# Custom Docker Compose Cmds
+#
+
+rebuild: .env ${COMPOSE_FILENAME}
+	$(DKC) stop && \
 	$(DKC) build --no-cache
 
 clean-up: .env down
@@ -50,6 +56,8 @@ exec-or-run = $(if $(call task-up,$1),exec,run --rm) $2 $1
 
 #
 # Wrapped Docker Compose commands
+# Change default options or ensure a fresh compose.yaml.
+# Additional arguments to `make` are passed-through to docker compose.
 #
 
 # Commands we especially want to ensure have an up-to-date compose.yaml file
@@ -59,26 +67,21 @@ exec-or-run = $(if $(call task-up,$1),exec,run --rm) $2 $1
 # Note: to pass options, you need to prevent your shell from expanding them using --.
 # e.g. make -- run --entrypoint /bin/bash my-service
 #
-# WARNING: potential for conflicts when using run or exec if the command contains 
-# one of these keywords. You may override this list by setting SUB_CMD_ABLE 
-# to exclude the conflict. Or, you mayb simply choose to create a custom target
-# to invoke `docker compose` directly.
-#
-SUB_CMD_ABLE ?= up down build run exec logs
+WRAPPED_CMDS ?= up down build run exec logs
 
-# prevents the conflict with `build` by short-circuiting
-# when `run` or `exec` were also passed.
-${SUB_CMD_ABLE}: .env ${COMPOSE_FILENAME}
+# prevents conflicts between container run cmds and docker compose 
+# by short-circuiting when `run` or `exec` were passed and are not the target.
+${WRAPPED_CMDS}: .env ${COMPOSE_FILENAME}
 	$(or \
-		$(and $(filter build,$@),$(filter run exec,$(MAKECMDGOALS)), ), \
+		$(if $(and $(filter-out run exec,$@),$(filter run exec,${MAKECMDGOALS})),# no-op), \
 		$(DKC) $@ \
 			$(if $(filter $@,up),-d) \
 			$(if $(filter $@,run),--rm) \
 			$(if $(filter $@,logs),--follow) \
-			$(wordlist 2, $(words $(MAKECMDGOALS)), $(MAKECMDGOALS)) \
+			$(wordlist 2, $(words ${MAKECMDGOALS}), ${MAKECMDGOALS}) \
 	)
 
-ifneq (,$(filter ${SUB_CMD_ABLE},$(MAKECMDGOALS)))
+ifneq (,$(filter ${WRAPPED_CMDS},${MAKECMDGOALS}))
 # Prevent errors when non-targets are passed for sub-commands
 %:
 	@# No-Op
