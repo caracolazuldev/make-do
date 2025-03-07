@@ -1,7 +1,7 @@
 # # #
 # Gnu Make functions for Wordpress developers
 #
-# Make-do Makefile Library Version: 2.0.1
+# Make-do Makefile Library Version: 2.0.3
 # https://github.com/caracolazuldev/make-do
 #
 # REQUIRES:

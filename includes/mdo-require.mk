@@ -1,7 +1,7 @@
 # # #
 # Generates an error if a variable is not defined.
 #
-# Make-do Makefile Library Version: 2.0.1
+# Make-do Makefile Library Version: 2.0.3
 # https://github.com/caracolazuldev/make-do
 # # #
 
