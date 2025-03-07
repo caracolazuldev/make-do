@@ -18,6 +18,10 @@ DKC_PROJ_DIR ?= .
 
 export DOCKER_DEFAULT_PLATFORM ?= linux/amd64
 
+# modest performance improvement since we aren't compiling C code
+MAKEFLAGS += --no-builtin-rules
+.SUFFIXES: # cancel suffix rules
+
 docker-platform:
 	$(info DOCKER_DEFAULT_PLATFORM: $(DOCKER_DEFAULT_PLATFORM))
 
