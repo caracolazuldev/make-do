@@ -12,6 +12,10 @@ include .env
 DKC ?= docker compose
 COMPOSE_FILENAME ?= compose.yaml
 
+# Compose file partials search directories:
+COMPOSE_SEARCH_DIRS ?= docker containers
+COMPOSE_CONFIG_SEARCH_DIRS ?= conf config configs
+
 # set the project directory to the repo root by default
 # only used (as of this time) when generating the compose.yaml
 DKC_PROJ_DIR ?= .
@@ -97,7 +101,10 @@ endif
 # Does not descend into subdirectories (-maxdepth 1)
 define default-env-includes
 $(strip \
-	$(shell find conf config configs -maxdepth 1 -type f -name '*.env' 2>/dev/null | sort) \
+	$(shell find ${COMPOSE_CONFIG_SEARCH_DIRS} \
+		-maxdepth 1 -type f -name '*.env' \
+		2>/dev/null \
+		| sort) \
 )
 endef
 
@@ -132,11 +139,11 @@ endif
 # Does not descend into subdirectories (-maxdepth 1)
 define default-compose-file-includes
 $(strip \
-	$(shell find docker containers -maxdepth 1 -type f \
+	$(shell find ${COMPOSE_SEARCH_DIRS} -maxdepth 1 -type f \
 		-name '*.yml' -o -name '*.yaml' \
 		2>/dev/null \
 		| grep -v profile | sort) \
-	$(shell find docker -maxdepth 1 -type f \
+	$(shell find ${COMPOSE_SEARCH_DIRS} -maxdepth 1 -type f \
 		-name '*.profile.yml' -o -name '*.profile.yaml' | sort) \
 )
 endef
