@@ -13,7 +13,7 @@ DKC ?= docker compose
 COMPOSE_FILENAME ?= compose.yaml
 
 # Compose file partials search directories:
-COMPOSE_SEARCH_DIRS ?= docker containers
+COMPOSE_SEARCH_DIRS ?= docker containers services
 COMPOSE_CONFIG_SEARCH_DIRS ?= conf config configs
 
 # set the project directory to the repo root by default
