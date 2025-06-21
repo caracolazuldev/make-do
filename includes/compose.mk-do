@@ -46,7 +46,7 @@ clean-up: .env down
 reset:
 	$(DKC) down --volumes
 
-services: ## List all services
+ls: ## List all services
 	@$(DKC) config --services
 
 #
