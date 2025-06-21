@@ -26,6 +26,8 @@ export DOCKER_DEFAULT_PLATFORM ?= linux/amd64
 MAKEFLAGS += --no-builtin-rules
 .SUFFIXES: # cancel suffix rules
 
+CACHED_DG := ${.DEFAULT_GOAL}# ensure we don't interfere with the default goal
+
 docker-platform:
 	$(info DOCKER_DEFAULT_PLATFORM: $(DOCKER_DEFAULT_PLATFORM))
 
@@ -164,3 +166,5 @@ endif
 	@# We set --project-directory so that we can store our profiles in a
 	@# subdirectory without changing the base path.
 	$(DKC) --project-directory ${DKC_PROJ_DIR} $(foreach f,$(filter-out .env,$^),-f $f) config >> $@ $(if ${DEBUG},,2>/dev/null)
+
+.DEFAULT_GOAL := ${CACHED_DG}
