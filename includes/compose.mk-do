@@ -5,32 +5,84 @@
 # https://github.com/caracolazuldev/make-do
 # # #
 
+#
+# See available configurations below in DEFAULTS
+#
+# Enable tracing by setting DEBUG to non-empty
+#
+# See the MAKEFILE RECIPE LIB for custom functions to use in your Makefilese
+#
+
+# modest performance improvement since we aren't compiling C code
+MAKEFLAGS += --no-builtin-rules
+.SUFFIXES: # cancel suffix rules
+
+ifdef DEBUG
+MAKEFLAGS += --trace
+endif
+
+CACHED_DG := ${.DEFAULT_GOAL}# ensure we don't interfere with the default goal
+
+#
+# MAKEFILE RECIPE LIB
+#
+
+# $(call trace,MY_VAR)
+# > MY_VAR=<MY_VAL>
+define trace
+$(if $(DEBUG),$(info $1=$($1)))
+endef
+
+task-up = $(if $(shell $(DKC) ps -q $1),$1 is running)
+warn-if-not-up = $(if $(call task-up,$1),,$(warn $1 is not running))
+
+# use second argument to pass OPTIONS to run/exec
+# docker compose run [OPTIONS] SERVICE [COMMAND] [ARGS...]
+# e.g. $(call exec-or-run,go-lang build,--workdir /myapp)
+exec-or-run = $(if $(call task-up,$1),exec,run --rm) $2 $1
+
+sanitize-paths =  $(foreach dir,$1,$(wildcard $(dir)))
+
+#
+# DEFAULTS
+#
+
 # enable use of env's in make recipes
 # and help keep .env up to date since includes are always prerequisites
 include .env
+# Include the .compose-profiles file if it exists
+include .compose-profiles
+$(call trace,COMPOSE_SEARCH_DIRS)
+$(call trace,COMPOSE_CONFIG_SEARCH_DIRS)
+
 
 DKC ?= docker compose
 COMPOSE_FILENAME ?= compose.yaml
-
-# Compose file partials search directories:
-COMPOSE_SEARCH_DIRS ?= docker containers services
-COMPOSE_CONFIG_SEARCH_DIRS ?= conf config configs
 
 # set the project directory to the repo root by default
 # only used (as of this time) when generating the compose.yaml
 DKC_PROJ_DIR ?= .
 
 export DOCKER_DEFAULT_PLATFORM ?= linux/amd64
+$(call trace,DOCKER_DEFAULT_PLATFORM)
 
-# modest performance improvement since we aren't compiling C code
-MAKEFLAGS += --no-builtin-rules
-.SUFFIXES: # cancel suffix rules
+# Compose file partials search directories:
+COMPOSE_SEARCH_DIRS ?= docker containers services
+COMPOSE_SEARCH_DIRS := $(call sanitize-paths,${COMPOSE_SEARCH_DIRS})
 
-CACHED_DG := ${.DEFAULT_GOAL}# ensure we don't interfere with the default goal
+COMPOSE_CONFIG_BASE_DIR ?= conf config configs etc
+COMPOSE_CONFIG_BASE_DIR := $(call sanitize-paths,${COMPOSE_CONFIG_BASE_DIR})
 
-docker-platform:
-	$(info DOCKER_DEFAULT_PLATFORM: $(DOCKER_DEFAULT_PLATFORM))
+# TODO: I think not needed now?
+# if more than one word in COMPOSE_CONFIG_SEARCH_DIRS, throw an error
+# ifneq ($(words $(COMPOSE_CONFIG_BASE_DIR)), 1)
+# $(error "COMPOSE_CONFIG_BASE_DIR must be a single directory path")
+# endif
 
+COMPOSE_CONFIG_SEARCH_DIRS ?= ${COMPOSE_CONFIG_BASE_DIR}
+COMPOSE_CONFIG_SEARCH_DIRS := $(call sanitize-paths,${COMPOSE_CONFIG_SEARCH_DIRS})
+$(call trace,COMPOSE_CONFIG_BASE_DIR)
+$(call trace,COMPOSE_CONFIG_SEARCH_DIRS)
 
 #
 # Custom Docker Compose Cmds
@@ -46,19 +98,9 @@ clean-up: .env down
 reset:
 	$(DKC) down --volumes
 
-ls: ## List all services
+# List all services
+ls list: ${COMPOSE_FILENAME}
 	@$(DKC) config --services
-
-#
-# Helper functions for make recipes
-#
-
-task-up = $(if $(shell $(DKC) ps -q $1),$1 is running)
-warn-if-not-up = $(if $(call task-up,$1),,$(warn $1 is not running))
-#
-#optional second argument for args to docker compose run/exec
-# e.g. --workdir ...
-exec-or-run = $(if $(call task-up,$1),exec,run --rm) $2 $1
 
 #
 # Wrapped Docker Compose commands
@@ -111,6 +153,7 @@ $(strip \
 endef
 
 ENV_INCLUDES ?= ${default-env-includes}
+$(call trace,ENV_INCLUDES)
 
 .env: ${ENV_INCLUDES}
 	@ echo '# ' > $@
@@ -139,12 +182,14 @@ endif
 # docker/*.yml|*.yaml
 # *.profile.* files sorted last
 # Does not descend into subdirectories (-maxdepth 1)
+# [TODO: remove .profile support? DEPRECATED ]
 define default-compose-file-includes
 $(strip \
 	$(shell find ${COMPOSE_SEARCH_DIRS} -maxdepth 1 -type f \
 		-name '*.yml' -o -name '*.yaml' \
 		2>/dev/null \
-		| grep -v profile | sort) \
+		| grep -v profile | sort \
+	) \
 	$(shell find ${COMPOSE_SEARCH_DIRS} -maxdepth 1 -type f \
 		-name '*.profile.yml' -o -name '*.profile.yaml' \
 		2>/dev/null \
@@ -154,10 +199,7 @@ $(strip \
 endef
 
 COMPOSE_FILES ?= ${default-compose-file-includes}
-
-ifdef DEBUG
-$(info COMPOSE_FILES=${COMPOSE_FILES})
-endif
+$(call trace,COMPOSE_FILES)
 
 ${COMPOSE_FILENAME}: .env ${COMPOSE_FILES}
 ifeq (,COMPOSE_FILES)
@@ -170,4 +212,46 @@ endif
 	@# subdirectory without changing the base path.
 	$(DKC) --project-directory ${DKC_PROJ_DIR} $(foreach f,$(filter-out .env,$^),-f $f) config >> $@ $(if ${DEBUG},,2>/dev/null)
 
+#
+# Manage "compose profiles"
+#
+
+# Define the template for .compose-profiles as an embedded variable
+COMPOSE_PROFILES_TPL = COMPOSE_SEARCH_DIRS=${COMPOSE_SEARCH_DIRS}\nCOMPOSE_CONFIG_SEARCH_DIRS=${COMPOSE_CONFIG_SEARCH_DIRS}
+
+# Redefine profile-activate to update env vars and regenerate .compose-profiles
+profile-activate:
+	@if [ -z "$(PROFILE)" ]; then \
+		echo "Error: PROFILE variable is not set."; \
+		exit 1; \
+	fi
+	@echo "Activating profile: $(PROFILE)"
+	$(eval export COMPOSE_SEARCH_DIRS += $(foreach dir,${COMPOSE_SEARCH_DIRS},$(wildcard ${dir}/${PROFILE})))
+	$(eval export COMPOSE_CONFIG_SEARCH_DIRS += $(foreach dir,${COMPOSE_CONFIG_SEARCH_DIRS},$(wildcard ${dir}/${PROFILE})))
+	@echo "${COMPOSE_PROFILES_TPL}" >.compose-profiles
+	@-rm ${COMPOSE_FILENAME} .env || true
+
+# Redefine profile-deactivate to update env vars and regenerate .compose-profiles
+profile-deactivate:
+	@if [ -z "$(PROFILE)" ]; then \
+		echo "Error: PROFILE variable is not set."; \
+		exit 1; \
+	fi
+	@echo "Deactivating profile: $(PROFILE)"
+	$(eval export COMPOSE_SEARCH_DIRS = $(filter-out %/$(PROFILE), $(COMPOSE_SEARCH_DIRS)))
+	$(eval export COMPOSE_CONFIG_SEARCH_DIRS = $(filter-out %/$(PROFILE), $(COMPOSE_CONFIG_SEARCH_DIRS)))
+	@echo "${COMPOSE_PROFILES_TPL}" >.compose-profiles
+	@-rm ${COMPOSE_FILENAME} .env || true
+
+# List currently active profiles
+profile-list:
+	@echo "Active profiles:"
+	@grep -oP '(?<=COMPOSE_SEARCH_DIRS=).*' .compose-profiles | tr ' ' '\n' | grep '/' | sed 's|.*/||'
+
+# Generate .compose-profiles using sed for variable substitution
+.compose-profiles:
+	@echo "Generating .compose-profiles from embedded template..."
+	@echo "${COMPOSE_PROFILES_TPL}" > $@
+
+# restore the default goal to the cached value
 .DEFAULT_GOAL := ${CACHED_DG}
