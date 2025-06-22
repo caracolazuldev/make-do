@@ -11,11 +11,21 @@
 # Provides the make function $(http-fetch)
 # # #
 
-#:-
+#:- includes
+# include auto-includes.mk-do
+# include cli.mk-do
 # include compose.mk-do
+# include config.mk-do
+# include container-registry.mk-do
+# include embed-awk.mk-do
+# include git.mk-do
+# include help.mk-do
+# include modules.mk-do
+# include require.mk-do
+# include wp.mk-do
 #-:
 
-#:-
+#:- version
 MKDO_VERSION ?= 2.1.0
 #-:
 
