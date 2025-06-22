@@ -35,16 +35,10 @@ install: ${MDO_INCLUDES}
 
 uninstall: $(foreach inc,${MDO_INCLUDES},uninstall-${inc})
 
-includes/config.mk-do:
-	$(eval sources = $(shell find src/ -name '*.awk' ))
-	@for src in ${sources}; do \
-		$(MAKE) -s -f includes/embed-awk.mk-do embed-awk -- --target=$@ --embed-file="$$src"; \
-	done;
-
 release: includes/config.mk-do | require-env-RELEASE_VERSION
-	@$(MAKE) -s update-version
-	@$(MAKE) -s update-readme-overview
-	@$(MAKE) -s update-makedo-includes
+	@$(MAKE) -s update-version \
+	update-readme-overview \
+	update-makedo-includes
 
 update-version:
 	@echo "Updating version to ${RELEASE_VERSION}..."
@@ -62,13 +56,14 @@ update-readme-overview:
 		name=$$(basename $$file); \
 		echo "* \`$$name\` - $$desc" >> tmp_overview; \
 	done
+	@echo "" >> tmp_overview
 	@sed -i '/## Include Index/,/## /{//!d}' README.md
 	@sed -i '/## Include Index/r tmp_overview' README.md
 	@rm tmp_overview
 
 update-makedo-includes:
 	@echo "Updating MakeDo.mk include directives..."
-	@echo "#:- includes" > tmp_makedo
+	@touch tmp_makedo
 	@for file in $(shell find includes -name '*.mk-do' | sort); do \
 		name=$$(basename $$file); \
 		echo "# include $$name" >> tmp_makedo; \
@@ -77,3 +72,12 @@ update-makedo-includes:
 	@sed -i '/#:- includes/,/#-:/c\#:- includes\n#-:' MakeDo.mk
 	@sed -i '/#:- includes/r tmp_makedo' MakeDo.mk
 	@rm tmp_makedo
+
+#
+# Build config.mk-do
+includes/config.mk-do:
+	$(eval sources = $(shell find src/ -name '*.awk' ))
+	@for src in ${sources}; do \
+		$(MAKE) -s -f includes/embed-awk.mk-do embed-awk -- --target=$@ --embed-file="$$src"; \
+	done;
+

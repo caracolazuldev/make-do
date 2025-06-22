@@ -2,28 +2,6 @@
 
 A collection of Makefile includes that can be dropped-in to a project to add Make rules. Install the library globally, or selectively copy the includes into your project.
 
-## Install global make includes
-
-```
-git clone ...
-make install
-```
-
-You can manually add files from the includes/ directory to your project. Alternatively, you can use the install command to add the includes to a standard search path for make includes. The location is set by...
-```make
-MAKE_INCLUDES_PATH ?= /usr/local/include/#
-```
-
-### Installing via Homebrew
-
-
-- https://superuser.com/questions/31744/how-to-get-git-completion-bash-to-work-on-mac-os-x/31753
-- https://troymccall.com/better-bash-4--completions-on-osx/
-
-## Version 1.0 of this library
-
-The goal of this project changed significantly. Version 1.0 aimed for more than a collection of copy-paste includes for Makefiles. The attempt to create a module system was probably mis-guided. Another goal was to facilitate using make to create light-weight CLI commands, including with bash completions. The bash completion snippits is a straightforward example of how to write bash completions, even outside of Makefiles.
-
 ## Include Index
 
 The source of each include is the best reference. Here is an incomplete list of some of the includes, and what they provide.
@@ -39,3 +17,34 @@ The source of each include is the best reference. Here is an incomplete list of 
 * `modules.mk-do` - Modular Makefile Framework (Deprecated? - needs work)
 * `require.mk-do` - Utilities to require that a variable is set, and if not, print an error message and exit.
 * `wp.mk-do` - Utilities for Wordpress developers.
+
+## Install in Project (recommended)
+
+Requires `curl` or `wget`. You can always download individual files from GitHub, but using the distribution Makefile (`MakeDo.mk`) will make it easy to refresh or upgrade the includes.
+
+Copy the `MakeDo.mk` into your project. See the USAGE comment in the file for options to declare the includes you want to use in your project.
+
+## Install global make includes
+
+If you use the libraries a lot, you may want to make them global includes available to any Makefile on your system. For a long-term project, this is not recommended.
+
+```
+git clone ...
+make install
+```
+
+The above adds the includes to a standard search path for make includes. The location can be overridden by env variable and defaults to...
+```make
+MAKE_INCLUDES_PATH ?= /usr/local/include/#
+```
+
+### Installing via Homebrew
+
+
+- https://superuser.com/questions/31744/how-to-get-git-completion-bash-to-work-on-mac-os-x/31753
+- https://troymccall.com/better-bash-4--completions-on-osx/
+
+## Version 1.0 of this library
+
+The goal of this project changed significantly. Version 1.0 aimed for more than a collection of copy-paste includes for Makefiles. The attempt to create a module system was probably mis-guided. Another goal was to facilitate using make to create light-weight CLI commands, including with bash completions. The bash completion snippits is a straightforward example of how to write bash completions, even outside of Makefiles.
+

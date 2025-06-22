@@ -1,14 +1,24 @@
 # # #
 # Make Do fetcher.
+# Provides a *.mk-do recipe to download raw files from github.
+#
+# Provides the make function $(http-fetch) when included in your project.
+#
+# Requires and auto-detects either `wget` or `curl` commands.
 #
 # USAGE: 
+# 
+# For quick install:
 # - include this file in your project Makefile.
-# - set MKDO_VERSION
-# - select libraries by including them in your Makefile, 
-# - or un-comment here
+# - un-comment includes below or add them to your Makefile
+# - includes will be fetched (made) on next run.
 #
-# Auto-detects `wget` or `curl` commands.
-# Provides the make function $(http-fetch)
+# For more control:
+# - `MKDO_VERSION=9.2.7 make -f MakeDo.mk <list includes>` will fetch to your working dir.
+#
+# For dev (main) branch or other branch:
+# - `MKDO_VERSION=main make -f MakeDo.mk <list includes>`
+#
 # # #
 
 #:- includes
