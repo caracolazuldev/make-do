@@ -13,7 +13,7 @@
 # This hides sub-targets from the top-level Makefile, providing some order.
 #
 # Includes a system for providing default configuration values.
-# TODO: reconcile configuration features with mdo-config.mk library.
+# TODO: reconcile configuration features with config.mk-do library.
 #
 
 ###

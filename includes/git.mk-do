@@ -5,7 +5,7 @@
 # https://github.com/caracolazuldev/make-do
 # # #
 
-include mdo-require.mk
+include require.mk-do
 
 define HELP_TEXT
  - Git Repos -
@@ -32,7 +32,7 @@ ENVIRONMENT CONFIG
 
 endef
 
-include mdo-help.mk
+include help.mk-do
 
 GITHUB_ORG ?= ginkgostreet
 GIT_REPOS_BASE_URL ?= git@github.com:${GITHUB_ORG}/#

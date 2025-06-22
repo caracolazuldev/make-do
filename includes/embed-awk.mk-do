@@ -11,7 +11,7 @@ AWK ?= awk
 #
 # Example usage:
 #
-# includes/mdo-config.mk:
+# includes/config.mk-do:
 # 	$(eval sources = $(shell find src/ -name '*.awk' ))
 # 	@for src in ${sources}; do \
 # 		$(MAKE) -s -f update-embeds.mk embed-awk -- --target=$@ --embed-file="$$src"; \

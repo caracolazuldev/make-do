@@ -28,11 +28,11 @@ The goal of this project changed significantly. Version 1.0 aimed for more than 
 
 The source of each include is the best reference. Here is an incomplete list of some of the includes, and what they provide.
 
-* `mdo-require.mk` - A way to require that a variable is set, and if not, print an error message and exit.
-* `mdo-wp.mk` - utilities for Wordpress developers
-* `mdo-config.mk` - create configuration files from templates
-* `mdo-embed-awk.mk` - embed awk scripts in a Makefile
-* `mdo-container-registry.mk` - build, tag, and publish docker images
-* `mdo-compose.mk` - wrapper for docker-compose
-* `mdo-git.mk` - manage a directory of git repositories and perform global actions on them.
-* `mdo-help.mk` - utils for adding help documentation to Makefiles
+* `require.mk-do` - A way to require that a variable is set, and if not, print an error message and exit.
+* `wp.mk-do` - utilities for Wordpress developers
+* `config.mk-do` - create configuration files from templates
+* `embed-awk.mk-do` - embed awk scripts in a Makefile
+* `container-registry.mk-do` - build, tag, and publish docker images
+* `compose.mk-do` - wrapper for docker-compose
+* `git.mk-do` - manage a directory of git repositories and perform global actions on them.
+* `help.mk-do` - utils for adding help documentation to Makefiles

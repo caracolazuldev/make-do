@@ -1,10 +1,10 @@
-include includes/mdo-help.mk
-include includes/mdo-require.mk
+include includes/help.mk-do
+include includes/require.mk-do
 
 MAKE_INCLUDES_PATH ?= /usr/local/include/#
 DEV_INSTALL ?= ${--dev}# link instead of deploy files
 
-MDO_INCLUDES := $(shell find includes -name 'mdo-*.mk' | sed 's/includes\///g')
+MDO_INCLUDES := $(shell find includes -name '*.mk-do' | sed 's/includes\///g')
 
 default: help
 
@@ -25,7 +25,7 @@ define unlink-library
 	- test -L ${MAKE_INCLUDES_PATH}${*} && unlink ${MAKE_INCLUDES_PATH}${*}
 endef
 
-mdo-%.mk:
+%.mk-do:
 	$(if ${DEV_INSTALL},$(link-library),$(install-library))
 
 uninstall-%:
@@ -35,11 +35,11 @@ install: ${MDO_INCLUDES}
 
 uninstall: $(foreach inc,${MDO_INCLUDES},uninstall-${inc})
 
-includes/mdo-config.mk:
+includes/config.mk-do:
 	$(eval sources = $(shell find src/ -name '*.awk' ))
 	@for src in ${sources}; do \
-		$(MAKE) -s -f includes/mdo-embed-awk.mk embed-awk -- --target=$@ --embed-file="$$src"; \
+		$(MAKE) -s -f includes/embed-awk.mk-do embed-awk -- --target=$@ --embed-file="$$src"; \
 	done;
 
-release: includes/mdo-config.mk | require-env-RELEASE_VERSION
+release: includes/config.mk-do | require-env-RELEASE_VERSION
 	./update-version.sh ${RELEASE_VERSION}

@@ -19,7 +19,7 @@
 # - CMS_ADMIN_PASSWORD
 # - CMS_ADMIN_EMAIL
 #
-include mdo-require.mk
+include require.mk-do
 
 WEB_USER ?= www-data
 WP_PLUGINS_SRC ?= ./
