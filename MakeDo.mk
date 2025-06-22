@@ -29,9 +29,13 @@
 MKDO_VERSION ?= 2.1.0
 #-:
 
+MKDO_FETCH_URL ?= https://raw.githubusercontent.com/caracolazuldev/make-do/refs
+
 %.mk-do:
-	$(eval MKDO_REPO ?= https://raw.githubusercontent.com/caracolazuldev/make-do)
-	@$(http-fetch) ${MKDO_REPO}/refs/tags/${MKDO_VERSION}/includes/$@
+	$(eval MKDO_FETCH_URI := $(if $(findstring .,${MKDO_VERSION}), \
+		tags/${MKDO_VERSION}/includes, \
+		heads/${MKDO_VERSION}/includes))
+	@$(http-fetch) ${MKDO_FETCH_URL}/${MKDO_FETCH_URI}/$@
 	@echo "Installed $@"
 
 define http-fetch
