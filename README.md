@@ -24,15 +24,18 @@ MAKE_INCLUDES_PATH ?= /usr/local/include/#
 
 The goal of this project changed significantly. Version 1.0 aimed for more than a collection of copy-paste includes for Makefiles. The attempt to create a module system was probably mis-guided. Another goal was to facilitate using make to create light-weight CLI commands, including with bash completions. The bash completion snippits is a straightforward example of how to write bash completions, even outside of Makefiles.
 
-## Overview
+## Include Index
 
 The source of each include is the best reference. Here is an incomplete list of some of the includes, and what they provide.
 
-* `require.mk-do` - A way to require that a variable is set, and if not, print an error message and exit.
-* `wp.mk-do` - utilities for Wordpress developers
-* `config.mk-do` - create configuration files from templates
-* `embed-awk.mk-do` - embed awk scripts in a Makefile
-* `container-registry.mk-do` - build, tag, and publish docker images
-* `compose.mk-do` - wrapper for docker-compose
-* `git.mk-do` - manage a directory of git repositories and perform global actions on them.
-* `help.mk-do` - utils for adding help documentation to Makefiles
+* `auto-includes.mk-do` - DEPRECATED: it's good to declare your dependencies.
+* `cli.mk-do` - CLI user interaction utils.
+* `compose.mk-do` - Manage docker compose with file partials and a replacement "profile" feature.
+* `config.mk-do` - Create configuration files from templates.
+* `container-registry.mk-do` - Build/Tag (and optionally publish) Docker images.
+* `embed-awk.mk-do` - Embed an awk script into a Makefile.
+* `git.mk-do` - Manage a directory of git repositories and perform global actions on them.
+* `help.mk-do` - Define a target called, help, using a README if found.
+* `modules.mk-do` - Modular Makefile Framework (Deprecated? - needs work)
+* `require.mk-do` - Utilities to require that a variable is set, and if not, print an error message and exit.
+* `wp.mk-do` - Utilities for Wordpress developers.

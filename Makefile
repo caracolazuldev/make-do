@@ -43,3 +43,18 @@ includes/config.mk-do:
 
 release: includes/config.mk-do | require-env-RELEASE_VERSION
 	./update-version.sh ${RELEASE_VERSION}
+	@$(MAKE) -s update-readme-overview
+
+update-readme-overview:
+	@echo "Updating README.md ## Include Index section..."
+	@echo "" > tmp_overview
+	@echo "The source of each include is the best reference. Here is an incomplete list of some of the includes, and what they provide." >> tmp_overview
+	@echo "" >> tmp_overview
+	@for file in $(shell find includes -name '*.mk-do' | sort); do \
+		desc=$$(grep -m 1 -E '^[[:space:]]*#[[:space:]]*[[:alnum:]]' $$file | sed 's/^[[:space:]]*#[[:space:]]*//'); \
+		name=$$(basename $$file); \
+		echo "* \`$$name\` - $$desc" >> tmp_overview; \
+	done
+	@sed -i '/## Include Index/,/## /{//!d}' README.md
+	@sed -i '/## Include Index/r tmp_overview' README.md
+	@rm tmp_overview
