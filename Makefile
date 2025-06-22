@@ -42,9 +42,15 @@ includes/config.mk-do:
 	done;
 
 release: includes/config.mk-do | require-env-RELEASE_VERSION
-	./update-version.sh ${RELEASE_VERSION}
+	@$(MAKE) -s update-version
 	@$(MAKE) -s update-readme-overview
 	@$(MAKE) -s update-makedo-includes
+
+update-version:
+	@echo "Updating version to ${RELEASE_VERSION}..."
+	./update-version.sh ${RELEASE_VERSION}
+	@echo "Updating MKDO_VERSION in MakeDo.mk..."
+	@sed -i "s/^MKDO_VERSION ?=.*/MKDO_VERSION ?= ${RELEASE_VERSION}/" MakeDo.mk
 
 update-readme-overview:
 	@echo "Updating README.md ## Include Index section..."
@@ -62,8 +68,7 @@ update-readme-overview:
 
 update-makedo-includes:
 	@echo "Updating MakeDo.mk include directives..."
-	# @echo "#:- includes" > tmp_makedo
-	@touch tmp_makedo
+	@echo "#:- includes" > tmp_makedo
 	@for file in $(shell find includes -name '*.mk-do' | sort); do \
 		name=$$(basename $$file); \
 		echo "# include $$name" >> tmp_makedo; \
