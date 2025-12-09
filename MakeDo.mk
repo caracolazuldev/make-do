@@ -36,7 +36,7 @@
 #-:
 
 #:- version
-MKDO_VERSION ?= 2.1.0
+MKDO_VERSION ?= 2.1.1
 #-:
 
 MKDO_FETCH_URL ?= https://raw.githubusercontent.com/caracolazuldev/make-do/refs
