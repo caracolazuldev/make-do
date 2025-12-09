@@ -42,7 +42,7 @@ warn-if-not-up = $(if $(call task-up,$1),,$(warn $1 is not running))
 # e.g. $(call exec-or-run,go-lang build,--workdir /myapp)
 exec-or-run = $(if $(call task-up,$1),exec,run --rm) $2 $1
 
-validate-paths =  $(foreach dir,$1,$(wildcard $(dir)))
+validate-paths = $(strip $(foreach dir,$1,$(wildcard $(dir))))
 
 #
 # DEFAULTS
@@ -54,9 +54,6 @@ include .env
 
 # Include the .compose-profiles file if it exists
 include .compose-profiles
-$(call trace,COMPOSE_SEARCH_DIRS)
-$(call trace,COMPOSE_CONFIG_SEARCH_DIRS)
-
 
 DKC ?= docker compose
 COMPOSE_FILENAME ?= compose.yaml
@@ -69,22 +66,17 @@ export DOCKER_DEFAULT_PLATFORM ?= linux/amd64
 $(call trace,DOCKER_DEFAULT_PLATFORM)
 
 # Compose file partials search directories:
-COMPOSE_SEARCH_DIRS ?= docker containers services
+ifeq ($(strip ${COMPOSE_SEARCH_DIRS}),)
+# not using ?= because sometimes is set to empty in .compose-profiles
+COMPOSE_SEARCH_DIRS = docker containers services
+endif
 COMPOSE_SEARCH_DIRS := $(call validate-paths,${COMPOSE_SEARCH_DIRS})
 
-COMPOSE_CONFIG_BASE_DIR ?= conf config configs etc
-COMPOSE_CONFIG_BASE_DIR := $(call validate-paths,${COMPOSE_CONFIG_BASE_DIR})
-
-# TODO: I think not needed now?
-# if more than one word in COMPOSE_CONFIG_SEARCH_DIRS, throw an error
-# ifneq ($(words $(COMPOSE_CONFIG_BASE_DIR)), 1)
-# $(error "COMPOSE_CONFIG_BASE_DIR must be a single directory path")
-# endif
-
-COMPOSE_CONFIG_SEARCH_DIRS ?= ${COMPOSE_CONFIG_BASE_DIR}
+ifeq ($(strip ${COMPOSE_CONFIG_SEARCH_DIRS}),)
+# not using ?= because sometimes is set to empty in .compose-profiles
+COMPOSE_CONFIG_SEARCH_DIRS = conf config configs etc env
+endif
 COMPOSE_CONFIG_SEARCH_DIRS := $(call validate-paths,${COMPOSE_CONFIG_SEARCH_DIRS})
-$(call trace,COMPOSE_CONFIG_BASE_DIR)
-$(call trace,COMPOSE_CONFIG_SEARCH_DIRS)
 
 #
 # Custom Docker Compose Cmds
